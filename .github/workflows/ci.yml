@@ -2,62 +2,36 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
-    paths:
-      - "nervous_analytics/**"
-      - "tests/**"
-      - ".github/workflows/ci.yml"
-      - "pyproject.toml"
-      - ".pre-commit-config.yaml"
-      - "poetry.lock"
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
-    paths:
-      - "nervous_analytics/**"
-      - "tests/**"
-      - ".github/workflows/ci.yml"
-      - "pyproject.toml"
-      - ".pre-commit-config.yaml"
-      - "poetry.lock"
+    branches:
+      - main
 
 jobs:
-  lint_test_build:
-
-    strategy:
-      matrix:
-        os: [ ubuntu-latest ]
-        python-version: [ "3.12" ]
-
-    runs-on: ${{ matrix.os }}
+  test:
+    runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Install poetry
-      uses: abatilo/actions-poetry@v2
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
 
-    - name: Set up virtualenv
-      run: |
-        poetry config virtualenvs.in-project true
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest
 
-    - uses: actions/cache@v3
-      name: Cache
-      with:
-        path: ./.venv
-        key: venv-${{ hashFiles('poetry.lock') }}
+      - name: Run tests
+        run: pytest --junitxml=report.xml tests/
 
-    - name: 🔧 Install the project dev dependencies
-      run: |
-        poetry install --with dev
-
-    - name: 🧹 Lint with pre-commit
-      run: |
-        poetry run pre-commit run --all-files
-
-    - name: 🧪 Test with pytest
-      run: |
-        poetry run pytest
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: junit-test-report
+          path: report.xml
