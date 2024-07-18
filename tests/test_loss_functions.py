@@ -23,6 +23,8 @@ def check_simple_model_load(loss_fn):
     model.compile(optimizer='adam', loss=loss_fn)
     model.save('simple_model.keras')
     reconstructed_model = load_model('simple_model.keras', custom_objects=get_custom_loss_items())
+    reconstructed_model.compile(optimizer='adam', loss=loss_fn)
+
     os.remove('simple_model.keras')
     test_input = np.random.uniform(-10, 10, (5000, 10))
 
