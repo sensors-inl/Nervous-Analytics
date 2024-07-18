@@ -3,6 +3,7 @@ Regroups all the modules in charge of denoising & data preparation, called befor
 
 <img src="assets/pre_process_modules.png" width="600">
 
+
 # Post-process modules
 Regroups all the modules in charge of decision-making, called after ML inference.
 
