@@ -8,6 +8,8 @@ on:
       - "tests/**"
       - ".github/workflows/ci.yml"
       - "pyproject.toml"
+      - ".pre-commit-config.yaml"
+      - "poetry.lock"
   pull_request:
     branches: [ "main" ]
     paths:
@@ -15,6 +17,8 @@ on:
       - "tests/**"
       - ".github/workflows/ci.yml"
       - "pyproject.toml"
+      - ".pre-commit-config.yaml"
+      - "poetry.lock"
 
 jobs:
   lint_test_build:
