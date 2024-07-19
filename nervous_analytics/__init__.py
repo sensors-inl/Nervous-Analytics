@@ -1,9 +1,5 @@
-from .preprocessing import *
-from .postprocessing import *
-from .modeling import *
-from .template import *
-
 from nervous_analytics.modeling.ModelInference import ModelInference
+from . import preprocessing, postprocessing, modeling, template
 from .PhysioPrediction import PhysioPrediction
 from .PredictionTracker import PredictionTracker
 

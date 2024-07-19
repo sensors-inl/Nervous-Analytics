@@ -79,7 +79,6 @@ class ECGKnowledge(PostFilter):
             bpm = self._idx2bpm(idx2 - idx1)
 
             try:
-
                 if self._hr_min < bpm < self._hr_max:
                     # add a pair to mean that their bpm is in the normal range
                     corrected_pair.append([idx1, idx2])
@@ -87,9 +86,8 @@ class ECGKnowledge(PostFilter):
                     # add None to mean that there is a blurred area between two pairs
                     corrected_pair.append(None)
 
-            except:
-                print(f'pair : {pair}')
-                print(f'bpm : {bpm}')
+            except TypeError:
+                pass
 
         return corrected_pair
 
