@@ -1,7 +1,8 @@
+import random
+
 import numpy as np
 
 from nervous_analytics import postprocessing as post
-import random
 
 
 def test_ECGKnowledge():
@@ -50,9 +51,10 @@ def test_Threshold():
     output2 = process2.filter(input.copy())
     assert max(output1) <= 1
     assert max(output2) <= 1
-    print(np.count_nonzero(output1))
-    print(np.count_nonzero(output2))
-    #assert np.count_nonzero(output1)/len(output1) < 0.7
-    #assert np.count_nonzero(output2)/len(output2) < 0.7
     assert len(output1) == len(input)
     assert len(output2) == len(input)
+    ratio1 = np.count_nonzero(output1)/len(output1)
+    ratio2 = np.count_nonzero(output2)/len(output2)
+    assert 0.3 < ratio1 < 0.7
+    assert 0.3 < ratio2 < 0.7
+

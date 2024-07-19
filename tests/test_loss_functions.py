@@ -1,7 +1,7 @@
 import os
 
 import numpy as np
-from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.losses import Loss
 from tensorflow.keras.models import Sequential, load_model
 
@@ -17,11 +17,14 @@ def test_custom_loss_items():
 
 def check_simple_model_load(loss_fn):
     model = Sequential([
-        Dense(1, activation='sigmoid', input_shape=(10,))
+        Input(shape=(10,)),  # Utilisation de Input
+        Dense(1, activation='sigmoid')
     ])
     model.compile(optimizer='adam', loss=loss_fn)
     model.save('simple_model.keras')
     reconstructed_model = load_model('simple_model.keras', custom_objects=get_custom_loss_items())
+    reconstructed_model.compile(optimizer='adam', loss=loss_fn)
+
     os.remove('simple_model.keras')
     test_input = np.random.uniform(-10, 10, (5000, 10))
 
