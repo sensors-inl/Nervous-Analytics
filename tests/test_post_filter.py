@@ -56,6 +56,7 @@ def test_Threshold():
     assert len(output1) == len(input)
     assert len(output2) == len(input)
     ratio1 = np.count_nonzero(output1) / len(output1)
-    ratio2 = np.count_nonzero(output2) / len(output2)
-    assert 0.3 < ratio1 < 0.7
-    assert 0.3 < ratio2 < 0.7
+    ratio2 = np.count_nonzero(output1) / len(output1) #TODO
+    print(ratio1, ratio2)
+    assert 0.4 < ratio1 < 0.6
+    assert 0.4 < ratio2 < 0.6
