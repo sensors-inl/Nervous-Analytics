@@ -1,6 +1,6 @@
-from nervous_analytics import (PreProcess, PeakCleaner, FreqFilter, Differentiator, Threshold,
-                               FallSmoother, PostProcess, SCRSegmenter, EdgeCutter)
 from nervous_analytics.PhysioPrediction import PhysioPrediction
+from nervous_analytics.postprocessing import Threshold, PostProcess, SCRSegmenter, EdgeCutter
+from nervous_analytics.preprocessing import PreProcess, PeakCleaner, FreqFilter, Differentiator, FallSmoother
 
 
 def get_eda_template() -> PhysioPrediction:

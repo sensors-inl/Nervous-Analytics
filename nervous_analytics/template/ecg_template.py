@@ -1,10 +1,13 @@
 import os
-from tensorflow.keras.models import load_model
+
 import numpy as np
-from nervous_analytics.modeling.ModelInference import ModelInference
+from tensorflow.keras.models import load_model
+
 from nervous_analytics.PhysioPrediction import PhysioPrediction
-from nervous_analytics import (PreProcess, FreqFilter, WaveDecomposer, Normalizer, PostProcess,
-                               Threshold, PredictionSegmenter, ECGKnowledge, get_custom_loss_items)
+from nervous_analytics.modeling import get_custom_loss_items
+from nervous_analytics.modeling.ModelInference import ModelInference
+from nervous_analytics.postprocessing import PostProcess, Threshold, PredictionSegmenter, ECGKnowledge
+from nervous_analytics.preprocessing import PreProcess, FreqFilter, WaveDecomposer, Normalizer
 
 
 def get_ecg_template() -> PhysioPrediction:

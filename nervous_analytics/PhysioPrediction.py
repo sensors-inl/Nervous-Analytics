@@ -1,6 +1,9 @@
 import numpy as np
+
 from .PredictionTracker import PredictionTracker
-from nervous_analytics import ModelInference, PostProcess, PreProcess
+from .modeling import ModelInference
+from .postprocessing import PostProcess
+from .preprocessing import PreProcess
 
 
 class PhysioPrediction:

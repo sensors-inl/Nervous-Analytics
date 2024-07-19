@@ -1,5 +1,7 @@
 import random
-from nervous_analytics import PreProcess, PostProcess, Normalizer, Threshold
+
+from nervous_analytics.postprocessing import PostProcess, Threshold
+from nervous_analytics.preprocessing import PreProcess, Normalizer
 
 
 def check_type_and_length(process, class_type):

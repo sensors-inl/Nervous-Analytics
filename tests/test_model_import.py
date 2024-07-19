@@ -1,7 +1,9 @@
 import os
+
 from tensorflow.keras import Model
 from tensorflow.keras.models import load_model
-from nervous_analytics import get_custom_loss_items
+
+from nervous_analytics.modeling import get_custom_loss_items
 
 
 def check_model_import(model_name):

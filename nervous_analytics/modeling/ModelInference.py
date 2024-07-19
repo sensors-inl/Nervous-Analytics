@@ -1,6 +1,8 @@
 from typing import Callable, Dict, Tuple
+
 import numpy as np
-from nervous_analytics import PredictionTracker
+
+from .. import PredictionTracker
 
 
 class ModelInference:

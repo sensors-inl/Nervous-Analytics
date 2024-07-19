@@ -5,7 +5,7 @@ from tensorflow.keras.layers import Dense, Input
 from tensorflow.keras.losses import Loss
 from tensorflow.keras.models import Sequential, load_model
 
-from nervous_analytics import get_loss_function, get_custom_loss_items
+from nervous_analytics.modeling import get_custom_loss_items, get_loss_function
 
 
 def test_custom_loss_items():

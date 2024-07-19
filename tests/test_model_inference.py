@@ -1,9 +1,11 @@
 import os
+import random
+
 import numpy as np
 from tensorflow.keras.models import load_model
-from nervous_analytics import ModelInference, PredictionTracker
-from nervous_analytics import get_custom_loss_items
-import random
+
+from nervous_analytics import PredictionTracker
+from nervous_analytics.modeling import get_custom_loss_items, ModelInference
 
 
 def test_model_inference():
