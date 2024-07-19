@@ -52,15 +52,20 @@ jobs:
 
     - name: 🔧 Install the project dev dependencies
       run: |
-        echo "🔧 Install the project dev dependencies"
         poetry install --with dev
 
     - name: 🧹 Lint with pre-commit
       run: |
-        echo "🧹 Lint with pre-commit"
         poetry run pre-commit run --all-files
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add .
+        git commit -m "Apply pre-commit fixes" || echo "No changes to commit"
+        git push origin HEAD:${{ github.ref }}
 
     - name: 🧪 Test with pytest
       run: |
-        echo "🧪 Test with pytest"
         poetry run pytest
