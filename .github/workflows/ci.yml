@@ -6,11 +6,15 @@ on:
     paths:
       - "nervous_analytics/**"
       - "tests/**"
+      - ".github/workflows/ci.yml"
+      - "pyproject.toml"
   pull_request:
     branches: [ "main" ]
     paths:
       - "nervous_analytics/**"
       - "tests/**"
+      - ".github/workflows/ci.yml"
+      - "pyproject.toml"
 
 jobs:
   lint_test_build:
