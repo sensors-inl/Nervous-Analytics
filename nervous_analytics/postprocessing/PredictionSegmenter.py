@@ -1,9 +1,9 @@
 import numpy as np
+
 from .PostProcess import PostFilter
 
 
 class PredictionSegmenter(PostFilter):
-
     def filter(self, data, **kwargs):
         data = np.array(data)
         zone_found = False

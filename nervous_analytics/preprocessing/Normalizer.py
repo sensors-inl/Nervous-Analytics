@@ -1,5 +1,6 @@
-from .PreProcess import PreFilter
 import numpy as np
+
+from .PreProcess import PreFilter
 
 
 class Normalizer(PreFilter):
@@ -12,7 +13,6 @@ class Normalizer(PreFilter):
         self.offset = norm_min
         self.scale = norm_max - norm_min
         self.center_to_zero = center_to_zero
-
 
     def filter(self, data, **kwargs):
         # Normalize data (peak to peak at 0 to 1)

@@ -1,4 +1,5 @@
 import numpy as np
+
 from nervous_analytics.preprocessing.PreProcess import PreFilter
 from .PostProcess import PostFilter
 
@@ -10,21 +11,28 @@ class Threshold(PreFilter, PostFilter):
     or an adaptive threshold (based on the desired rate of data to keep).
     """
 
-    def __init__(self, threshold=None, non_zero_data_rate=None, output_thresholded_range=None):
+    def __init__(
+        self,
+        threshold=None,
+        non_zero_data_rate=None,
+        output_thresholded_range=None,
+    ):
         """
         :param threshold: Fixed threshold to apply to the data.
         :param non_zero_data_rate: Adaptive threshold to apply to the data based on the desired rate of data to keep.
         :param output_thresholded_range: If not None, the non-zero predictions will be normalized to this range.
         """
-        if ((threshold is None and non_zero_data_rate is None) or
-                (threshold is not None and non_zero_data_rate is not None)):
-            raise ValueError("You must provide either a threshold or a thresholded_data_rate")
+        if (threshold is None and non_zero_data_rate is None) or (
+            threshold is not None and non_zero_data_rate is not None
+        ):
+            raise ValueError(
+                "You must provide either a threshold or a thresholded_data_rate"
+            )
 
         super().__init__()
         self.threshold = threshold
         self.non_zero_data_rate = non_zero_data_rate
         self.output_thresholded_range = output_thresholded_range
-
 
     def filter(self, data, **kwargs):
         data = np.array(data)
@@ -38,11 +46,9 @@ class Threshold(PreFilter, PostFilter):
 
         return data
 
-
     def _fixed_threshold_filter(self, data):
         data[data < self.threshold] = 0
         return data
-
 
     def _adaptive_threshold_filter(self, data):
         a = min(data)
@@ -74,7 +80,6 @@ class Threshold(PreFilter, PostFilter):
 
         data[data < threshold] = 0
         return data
-
 
     def _normalize(self, data):
         non_zero_data = data[data > 0]

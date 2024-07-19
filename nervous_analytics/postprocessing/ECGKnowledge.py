@@ -2,8 +2,13 @@ from .PostProcess import PostFilter
 
 
 class ECGKnowledge(PostFilter):
-
-    def __init__(self, max_derivation=0.3, hr_range=None, ecg_sampling_rate = 1024, next_index=250):
+    def __init__(
+        self,
+        max_derivation=0.3,
+        hr_range=None,
+        ecg_sampling_rate=1024,
+        next_index=250,
+    ):
         """
         :param max_derivation: Maximum rate for the rise and fall of the heart rate
         :param hr_range: Largest theoretical heart rate range
@@ -31,9 +36,8 @@ class ECGKnowledge(PostFilter):
         self._hr_max = hr_range[1] if hr_range is not None else 180
         self._last_pair = None
 
-
     def filter(self, data, **kwargs):
-        pairs = [[data[i], data[i+1]] for i in range(len(data)-1)]
+        pairs = [[data[i], data[i + 1]] for i in range(len(data) - 1)]
 
         if self._last_pair is not None:
             last_peak_idx = self._last_pair[1]
@@ -49,7 +53,9 @@ class ECGKnowledge(PostFilter):
         # Remove values blurred area
         corrected_pair = [idxs for idxs in corrected_pair if idxs is not None]
         # Remove values from blacklist
-        corrected_pair = [idxs for idxs in corrected_pair if idxs not in blacklist]
+        corrected_pair = [
+            idxs for idxs in corrected_pair if idxs not in blacklist
+        ]
 
         # Remove full negative pairs
         corrected_pair = [idxs for idxs in corrected_pair if idxs[1] > 0]
@@ -63,14 +69,10 @@ class ECGKnowledge(PostFilter):
         for pair in pairs:
             blacklist_status = pair in blacklist
             labeled_pair.append(
-                {
-                    'pair': pair,
-                    'blacklist_status': blacklist_status
-                }
+                {"pair": pair, "blacklist_status": blacklist_status}
             )
 
         return labeled_pair
-
 
     def _remove_out_of_hr_range(self, pair):
         corrected_pair = []
@@ -90,7 +92,6 @@ class ECGKnowledge(PostFilter):
                 pass
 
         return corrected_pair
-
 
     def _get_blacklisted_pairs(self, corrected_pair):
         previous_bpm = None
@@ -114,7 +115,6 @@ class ECGKnowledge(PostFilter):
 
         return blacklist
 
-
     def _get_last_pair(self, pair):
         if not pair:
             return None
@@ -123,7 +123,5 @@ class ECGKnowledge(PostFilter):
         idx2 -= self.next_index
         return [idx1, idx2]
 
-
     def _idx2bpm(self, index_diff):
         return index_diff / self.ecg_sampling_rate * 60
-

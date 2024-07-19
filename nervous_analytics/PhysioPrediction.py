@@ -7,13 +7,15 @@ from .preprocessing import PreProcess
 
 
 class PhysioPrediction:
-
-    def __init__(self, preprocess: PreProcess = None, model_inference: ModelInference = None,
-                 postprocess: PostProcess = None):
+    def __init__(
+        self,
+        preprocess: PreProcess = None,
+        model_inference: ModelInference = None,
+        postprocess: PostProcess = None,
+    ):
         self.preprocess = preprocess
         self.model_inference = model_inference
         self.postprocess = postprocess
-
 
     def predict(self, input):
         """

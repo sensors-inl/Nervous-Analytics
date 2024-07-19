@@ -1,9 +1,9 @@
 from scipy.signal import butter, lfilter
+
 from .PreProcess import PreFilter
 
 
 class FreqFilter(PreFilter):
-
     def __init__(self, fs, cutoff, order, filter_type):
         """
         :param fs: Sampling frequency
@@ -13,18 +13,23 @@ class FreqFilter(PreFilter):
         :param filter_type: Type of filter (lowpass, highpass, bandpass, bandstop)
         """
         super().__init__()
-        if filter_type not in ['low', 'high', 'bandpass', 'bandstop']:
-            raise ValueError("filter_type must be 'low', 'high', 'bandpass' or 'bandstop'")
+        if filter_type not in ["low", "high", "bandpass", "bandstop"]:
+            raise ValueError(
+                "filter_type must be 'low', 'high', 'bandpass' or 'bandstop'"
+            )
 
-        if 'band' in filter_type:
+        if "band" in filter_type:
             if not isinstance(cutoff, (list, tuple)) or len(cutoff) != 2:
-                raise ValueError("cutoff must be a list or tuple with two elements for bandpass or bandstop filter")
+                raise ValueError(
+                    "cutoff must be a list or tuple with two elements for bandpass or bandstop filter"
+                )
         else:
             if isinstance(cutoff, (list, tuple)):
                 cutoff = cutoff[0]
 
-        [self.b_coeff, self.a_coeff] = butter(N=order, Wn=cutoff, fs=fs, btype=filter_type)
-
+        [self.b_coeff, self.a_coeff] = butter(
+            N=order, Wn=cutoff, fs=fs, btype=filter_type
+        )
 
     def filter(self, data, **kwargs):
         """

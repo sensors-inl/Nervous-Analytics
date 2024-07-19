@@ -1,5 +1,6 @@
-from .PreProcess import PreFilter
 import numpy as np
+
+from .PreProcess import PreFilter
 
 
 class Differentiator(PreFilter):
@@ -10,7 +11,6 @@ class Differentiator(PreFilter):
     def __init__(self, diff_n=1):
         super().__init__()
         self.diff_n = diff_n
-
 
     def filter(self, data, **kwargs):
         size = len(data)

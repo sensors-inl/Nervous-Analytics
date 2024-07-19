@@ -14,14 +14,8 @@ def check_type_and_length(process, class_type):
 def test_preprocess():
     preprocess = PreProcess(
         [
-            Normalizer(
-                norm_min=0,
-                norm_max=1
-            ),
-            Normalizer(
-                norm_min=0.25,
-                norm_max=0.75
-            )
+            Normalizer(norm_min=0, norm_max=1),
+            Normalizer(norm_min=0.25, norm_max=0.75),
         ]
     )
     check_type_and_length(preprocess, PreProcess)
@@ -35,7 +29,7 @@ def test_postprocess():
             ),
             Threshold(
                 non_zero_data_rate=0.25,
-            )
+            ),
         ]
     )
     check_type_and_length(postprocess, PostProcess)

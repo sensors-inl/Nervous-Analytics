@@ -6,4 +6,12 @@ from .PeakCleaner import PeakCleaner
 from .PreProcess import PreProcess
 from .WaveDecomposer import WaveDecomposer
 
-__all__ = ['Differentiator', 'FallSmoother', 'FreqFilter', 'Normalizer', 'PeakCleaner', 'PreProcess', 'WaveDecomposer']
+__all__ = [
+    "Differentiator",
+    "FallSmoother",
+    "FreqFilter",
+    "Normalizer",
+    "PeakCleaner",
+    "PreProcess",
+    "WaveDecomposer",
+]

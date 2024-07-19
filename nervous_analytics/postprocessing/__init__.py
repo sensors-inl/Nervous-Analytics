@@ -5,4 +5,11 @@ from .PredictionSegmenter import PredictionSegmenter
 from .SCRSegmenter import SCRSegmenter
 from .Threshold import Threshold
 
-__all__ = ['ECGKnowledge', 'EdgeCutter', 'PostProcess', 'PredictionSegmenter', 'SCRSegmenter', 'Threshold']
+__all__ = [
+    "ECGKnowledge",
+    "EdgeCutter",
+    "PostProcess",
+    "PredictionSegmenter",
+    "SCRSegmenter",
+    "Threshold",
+]
