@@ -26,10 +26,7 @@ def test_FreqFilter():
 
 
 def test_Normalizer():
-    check_type_and_length(
-        pre.Normalizer(norm_min=0, norm_max=1), pre.Normalizer
-    )
-
+    check_type_and_length(pre.Normalizer(norm_min=0, norm_max=1), pre.Normalizer)
 
 
 def test_PeakCleaner():
