@@ -1,8 +1,8 @@
 import numpy as np
 
-from .PredictionTracker import PredictionTracker
 from .modeling import ModelInference
 from .postprocessing import PostProcess
+from .prediction_tracker import PredictionTracker
 from .preprocessing import PreProcess
 
 
@@ -18,8 +18,7 @@ class PhysioPrediction:
         self.postprocess = postprocess
 
     def predict(self, input):
-        """
-        :param input: [Python list / Numpy array] Array of input or single input
+        """:param input: [Python list / Numpy array] Array of input or single input
         :return: [InferenceRec list] Array of InferenceRec containing each output for each process step
         """
         input = np.array(input)

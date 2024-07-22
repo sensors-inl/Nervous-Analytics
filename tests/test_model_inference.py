@@ -5,7 +5,7 @@ import numpy as np
 from tensorflow.keras.models import load_model
 
 from nervous_analytics import PredictionTracker
-from nervous_analytics.modeling import get_custom_loss_items, ModelInference
+from nervous_analytics.modeling import ModelInference, get_custom_loss_items
 
 
 def test_model_inference():

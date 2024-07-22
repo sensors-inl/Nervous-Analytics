@@ -1,9 +1,9 @@
-from .ECGKnowledge import ECGKnowledge
-from .EdgeCutter import EdgeCutter
-from .PostProcess import PostProcess
-from .PredictionSegmenter import PredictionSegmenter
-from .SCRSegmenter import SCRSegmenter
-from .Threshold import Threshold
+from .ecg_knowledge import ECGKnowledge
+from .edge_cutter import EdgeCutter
+from .postprocess import PostProcess
+from .prediction_segmenter import PredictionSegmenter
+from .scr_segmenter import SCRSegmenter
+from .threshold import Threshold
 
 __all__ = [
     "ECGKnowledge",

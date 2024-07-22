@@ -1,12 +1,10 @@
 import numpy as np
 
-from .PreProcess import PreFilter
+from .preprocess import PreFilter
 
 
 class Differentiator(PreFilter):
-    """
-    Differentiate data
-    """
+    """Differentiate data"""
 
     def __init__(self, diff_n=1):
         super().__init__()

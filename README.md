@@ -1,7 +1,7 @@
 # Nervous Analytics
 
 Package allowing to extract locations of R-peak from ECG signals in real time.
-The ECG process is mainly based on this [paper](https://doi.org/10.1016/j.eswa.2022.117187). 
+The ECG process is mainly based on this [paper](https://doi.org/10.1016/j.eswa.2022.117187).
 
 ## Installation
 
@@ -26,6 +26,3 @@ using two U-net CNN & LSTM based models. Finally, the post-processing stage is r
 <img src="nervous_analytics/assets/post_process_modules.png" width="400">
 
 ## Results
-
-
-

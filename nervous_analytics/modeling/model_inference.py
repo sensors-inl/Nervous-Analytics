@@ -2,8 +2,6 @@ from typing import Callable, Dict, Tuple
 
 import numpy as np
 
-from .. import PredictionTracker
-
 
 class ModelInference:
     def __init__(
@@ -14,7 +12,7 @@ class ModelInference:
         self.models_dico = models_dico
         self.processing_pred_dico_func = processing_pred_dico_func
 
-    def infer(self, tracker: PredictionTracker):
+    def infer(self, tracker):
         last_output = tracker.get_process_output(step_index=-1)
         pred_dico = {}
 

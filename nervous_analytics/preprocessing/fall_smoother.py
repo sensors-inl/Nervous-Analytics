@@ -1,13 +1,11 @@
 from scipy.interpolate import CubicSpline
 
-from .PreProcess import PreFilter
+from .preprocess import PreFilter
 
 
 class FallSmoother(PreFilter):
     def __init__(self, critical_fall_ratio=0.3):
-        """
-        :param critical_fall_ratio: Ratio under which a critical minimum (fake minimum) is considered.
-        """
+        """:param critical_fall_ratio: Ratio under which a critical minimum (fake minimum) is considered."""
         super().__init__()
         self.critical_fall_ratio = critical_fall_ratio
 
@@ -21,9 +19,7 @@ class FallSmoother(PreFilter):
         mini_list = [
             idx
             for idx in range(1, len(data) - 1)
-            if data[idx] < data[idx + 1]
-            and data[idx] < data[idx - 1]
-            and data[idx] != 0
+            if data[idx] < data[idx + 1] and data[idx] < data[idx - 1] and data[idx] != 0
         ]
 
         # Find left and right maxima
@@ -60,18 +56,12 @@ class FallSmoother(PreFilter):
                 interpolated_window = list(range(left, right + 1))
 
                 # Compute interpolation by removing the critical area
-                window_valid_index = [
-                    idx
-                    for idx in large_window
-                    if idx not in interpolated_window
-                ]
+                window_valid_index = [idx for idx in large_window if idx not in interpolated_window]
                 window_valid_value = [data[idx] for idx in window_valid_index]
                 cs = CubicSpline(window_valid_index, window_valid_value)
 
                 # Replace the critical area by the interpolated values
                 interpolated_values = cs(interpolated_window)
-                for idx, value in zip(
-                    interpolated_window, interpolated_values
-                ):
+                for idx, value in zip(interpolated_window, interpolated_values):
                     data[idx] = value
         return data

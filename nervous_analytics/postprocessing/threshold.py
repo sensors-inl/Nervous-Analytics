@@ -1,12 +1,12 @@
 import numpy as np
 
-from nervous_analytics.preprocessing.PreProcess import PreFilter
-from .PostProcess import PostFilter
+from nervous_analytics.preprocessing.preprocess import PreFilter
+
+from .postprocess import PostFilter
 
 
 class Threshold(PreFilter, PostFilter):
-    """
-    Threshold to remove low-confidence predictions.
+    """Threshold to remove low-confidence predictions.
     Possibility to choose between a fixed threshold
     or an adaptive threshold (based on the desired rate of data to keep).
     """
@@ -17,17 +17,16 @@ class Threshold(PreFilter, PostFilter):
         non_zero_data_rate=None,
         output_thresholded_range=None,
     ):
-        """
-        :param threshold: Fixed threshold to apply to the data.
-        :param non_zero_data_rate: Adaptive threshold to apply to the data based on the desired rate of data to keep.
-        :param output_thresholded_range: If not None, the non-zero predictions will be normalized to this range.
+        """:param threshold: Fixed threshold to apply to the data.
+        :param non_zero_data_rate: Adaptive threshold to apply to the data based on the desired
+        rate of data to keep.
+        :param output_thresholded_range: If not None, the non-zero predictions will be normalized
+        to this range.
         """
         if (threshold is None and non_zero_data_rate is None) or (
             threshold is not None and non_zero_data_rate is not None
         ):
-            raise ValueError(
-                "You must provide either a threshold or a thresholded_data_rate"
-            )
+            raise ValueError("You must provide either a threshold or a thresholded_data_rate")
 
         super().__init__()
         self.threshold = threshold

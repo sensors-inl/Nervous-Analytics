@@ -1,6 +1,6 @@
-from . import preprocessing, postprocessing, modeling, template
-from .PhysioPrediction import PhysioPrediction
-from .PredictionTracker import PredictionTracker
+from . import modeling, postprocessing, preprocessing, template
+from .physio_prediction import PhysioPrediction
+from .prediction_tracker import PredictionTracker
 
 __all__ = (
     [

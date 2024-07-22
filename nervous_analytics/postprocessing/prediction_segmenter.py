@@ -1,6 +1,6 @@
 import numpy as np
 
-from .PostProcess import PostFilter
+from .postprocess import PostFilter
 
 
 class PredictionSegmenter(PostFilter):

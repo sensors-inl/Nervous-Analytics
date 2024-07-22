@@ -1,12 +1,10 @@
 import numpy as np
 
-from .PreProcess import PreFilter
+from .preprocess import PreFilter
 
 
 class Normalizer(PreFilter):
-    """
-    Normalize data to [0, 1] or [-1, 1]
-    """
+    """Normalize data to [0, 1] or [-1, 1]"""
 
     def __init__(self, norm_min, norm_max, center_to_zero=False):
         super().__init__()

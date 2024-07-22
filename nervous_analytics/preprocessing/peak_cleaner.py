@@ -1,23 +1,18 @@
 import numpy as np
 
-from .PreProcess import PreFilter
+from .preprocess import PreFilter
 
 
 class PeakCleaner(PreFilter):
-    """
-    Remove peaks that are too high compared to the surrounding values.
+    """Remove peaks that are too high compared to the surrounding values.
     Developed for EDA due to electronic peak problems.
     """
 
-    def __init__(
-        self, max_ratio=10, avg_min_ratio=20, multi_point=False, max_points=8
-    ):
+    def __init__(self, max_ratio=10, avg_min_ratio=20, multi_point=False, max_points=8):
         super().__init__()
         self.max_ratio = max_ratio
         self.avg_min_ratio = avg_min_ratio
-        self._filter_function = (
-            self._filter_multi_point if multi_point else self._filter_one_point
-        )
+        self._filter_function = self._filter_multi_point if multi_point else self._filter_one_point
         self.max_points = max_points
 
     def filter(self, data, **kwargs):
@@ -33,9 +28,7 @@ class PeakCleaner(PreFilter):
 
         for idx in index:
             diff1 = abs(data[idx - 1] - data[idx + 1])
-            diff2 = max(
-                abs(data[idx - 1] - data[idx]), abs(data[idx + 1] - data[idx])
-            )
+            diff2 = max(abs(data[idx - 1] - data[idx]), abs(data[idx + 1] - data[idx]))
             ratio = diff2 / diff1
 
             if ratio > self.max_ratio and diff2 > amp_min:
@@ -71,9 +64,7 @@ class PeakCleaner(PreFilter):
                         current_index = idx + size + 1
                         # print(f'  idx: {idx} \t\t\t\tvalue: {data[idx]}')
                         # print(f'  idx+size+1: {idx+size+1} \t\tvalue: {data[idx+size+1]}')
-                        old_diff = abs(data[idx] - data[idx + size + 1]) / (
-                            size + 1
-                        )
+                        old_diff = abs(data[idx] - data[idx + size + 1]) / (size + 1)
                         break
 
         for idx1, idx2 in index_list:

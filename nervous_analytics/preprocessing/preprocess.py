@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
-from ..PredictionTracker import PredictionTracker
+from ..prediction_tracker import PredictionTracker
 
 
 class PreFilter(ABC):
@@ -15,8 +15,7 @@ class PreFilter(ABC):
 
 
 class PreProcess(PreFilter):
-    """
-    PreProcess object is a composition of multiple filters.
+    """PreProcess object is a composition of multiple filters.
     Execute the filters in the order they are passed in the constructor.
     """
 
@@ -31,8 +30,7 @@ class PreProcess(PreFilter):
             return self._filter_data(data=tracker_or_data)
 
     def _filter_tracker(self, tracker: PredictionTracker):
-        """
-        Apply all the filters in the order they are passed in the constructor.
+        """Apply all the filters in the order they are passed in the constructor.
         Add the output of each filter as a step in the InferenceRec object.
         """
         last_output = tracker.get_process_output(step_index=-1)

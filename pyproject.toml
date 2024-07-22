@@ -17,7 +17,6 @@ tensorflow = "^2.16.2"
 scipy = "^1.14.0"
 pandas = "^2.2.2"
 PyWavelets = "^1.6.0"
-pytest = "^8.2.2"
 
 [tool.poetry.group.dev]
 optional = true
@@ -30,8 +29,9 @@ pre-commit = "^3.7.1"
 exclude = ["tests"]
 
 [tool.ruff]
-line-length = 79
+line-length = 119
 target-version = "py312"
+lint.select = ["I", "E", "F", "C"]
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,6 +1,6 @@
 import random
 
-from nervous_analytics import template, PhysioPrediction, PredictionTracker
+from nervous_analytics import PhysioPrediction, PredictionTracker, template
 
 
 def get_random_signal():

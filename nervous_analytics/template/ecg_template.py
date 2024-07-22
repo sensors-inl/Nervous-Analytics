@@ -3,29 +3,27 @@ import os
 import numpy as np
 from tensorflow.keras.models import load_model
 
-from nervous_analytics.PhysioPrediction import PhysioPrediction
 from nervous_analytics.modeling import get_custom_loss_items
-from nervous_analytics.modeling.ModelInference import ModelInference
+from nervous_analytics.modeling.model_inference import ModelInference
+from nervous_analytics.physio_prediction import PhysioPrediction
 from nervous_analytics.postprocessing import (
-    PostProcess,
-    Threshold,
-    PredictionSegmenter,
     ECGKnowledge,
+    PostProcess,
+    PredictionSegmenter,
+    Threshold,
 )
 from nervous_analytics.preprocessing import (
-    PreProcess,
     FreqFilter,
-    WaveDecomposer,
     Normalizer,
+    PreProcess,
+    WaveDecomposer,
 )
 
 
 def get_ecg_template() -> PhysioPrediction:
     preprocess = PreProcess(
         [
-            FreqFilter(
-                fs=1024, cutoff=[0.5, 30], order=4, filter_type="bandpass"
-            ),
+            FreqFilter(fs=1024, cutoff=[0.5, 30], order=4, filter_type="bandpass"),
             WaveDecomposer(
                 wavelet="db3",
                 level=5,
@@ -38,9 +36,7 @@ def get_ecg_template() -> PhysioPrediction:
 
     postprocess = PostProcess(
         [
-            Threshold(
-                non_zero_data_rate=0.02, output_thresholded_range=[0.05, 1]
-            ),
+            Threshold(non_zero_data_rate=0.02, output_thresholded_range=[0.05, 1]),
             PredictionSegmenter(),
             ECGKnowledge(
                 max_derivation=0.3,
@@ -53,9 +49,7 @@ def get_ecg_template() -> PhysioPrediction:
     # Necessary to use the absolute path for tests
     base_path = os.path.dirname(os.path.abspath(__file__))
     cnn_path = os.path.join(base_path, "trained_models", "U_net_ECG_CNN.keras")
-    lstm_path = os.path.join(
-        base_path, "trained_models", "U_net_ECG_LSTM.keras"
-    )
+    lstm_path = os.path.join(base_path, "trained_models", "U_net_ECG_LSTM.keras")
     cnn_model = load_model(cnn_path, custom_objects=get_custom_loss_items())
     lstm_model = load_model(lstm_path, custom_objects=get_custom_loss_items())
 

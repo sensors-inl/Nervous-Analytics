@@ -1,13 +1,11 @@
 import numpy as np
 
-from .PostProcess import PostFilter
+from .postprocess import PostFilter
 
 
 class EdgeCutter(PostFilter):
     def __init__(self, index_range: list[int]):
-        """
-        :param edge_margin: Margin of the zone to remove localized indexes.
-        """
+        """:param edge_margin: Margin of the zone to remove localized indexes."""
         super().__init__()
         self.index_range = index_range
 

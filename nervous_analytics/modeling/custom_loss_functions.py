@@ -1,5 +1,5 @@
 import inspect
-from typing import Type, Dict
+from typing import Dict, Type
 
 import tensorflow as tf
 import tensorflow.keras.losses as losses
@@ -26,9 +26,7 @@ def get_loss_function(loss_function: str, **kwargs) -> losses.Loss:
             return losses.CategoricalFocalCrossentropy(**kwargs)
 
     except TypeError as ex:
-        raise ValueError(
-            f"Invalid parameters for loss function '{loss_function}': {ex}"
-        )
+        raise ValueError(f"Invalid parameters for loss function '{loss_function}': {ex}")
     raise ValueError(f"Loss function '{loss_function}' not recognized")
 
 
@@ -37,9 +35,7 @@ def get_custom_loss_items() -> Dict[str, Type[losses.Loss]]:
     classes = inspect.getmembers(__import__(current_module), inspect.isclass)
 
     custom_loss_classes = {
-        name: cls
-        for name, cls in classes
-        if issubclass(cls, losses.Loss) and cls.__module__ == current_module
+        name: cls for name, cls in classes if issubclass(cls, losses.Loss) and cls.__module__ == current_module
     }
     return custom_loss_classes
 
@@ -53,8 +49,7 @@ class BinaryWeightedCrossentropy(losses.Loss):
         reduction=losses.Reduction.NONE,
         **kwargs,
     ):
-        """
-        :param weight_one: Error weight for a label of 1.
+        """:param weight_one: Error weight for a label of 1.
         The larger weight_one is, the greater the error for a prediction close to 0.
         :param weight_zero: Error weight for a label of 0.
         The larger weight_zero is, the greater the error for a prediction close to 1.
@@ -91,17 +86,14 @@ class BinaryBalancedCrossentropy(losses.Loss):
         reduction=losses.Reduction.NONE,
         **kwargs,
     ):
-        """
-        :param balance_ratio: Proportion of error weight for a label of 1.
+        """:param balance_ratio: Proportion of error weight for a label of 1.
         The remaining proportion is for a label of 0.
         """
         super().__init__(name=name, reduction=reduction)
         self.balance_ratio = balance_ratio
 
     def call(self, y_true, y_pred):
-        bwce = BinaryWeightedCrossentropy(
-            weight_one=self.balance_ratio, weight_zero=1 - self.balance_ratio
-        )
+        bwce = BinaryWeightedCrossentropy(weight_one=self.balance_ratio, weight_zero=1 - self.balance_ratio)
         return bwce(y_true, y_pred)
 
     def get_config(self):

@@ -1,4 +1,4 @@
-from .PostProcess import PostFilter
+from .postprocess import PostFilter
 
 
 class ECGKnowledge(PostFilter):
@@ -9,8 +9,7 @@ class ECGKnowledge(PostFilter):
         ecg_sampling_rate=1024,
         next_index=250,
     ):
-        """
-        :param max_derivation: Maximum rate for the rise and fall of the heart rate
+        """:param max_derivation: Maximum rate for the rise and fall of the heart rate
         :param hr_range: Largest theoretical heart rate range
         :param ecg_sampling_rate: Sampling rate of the ECG signal
         :param next_index: Index of the previous window representing index 0 of the next window.
@@ -53,9 +52,7 @@ class ECGKnowledge(PostFilter):
         # Remove values blurred area
         corrected_pair = [idxs for idxs in corrected_pair if idxs is not None]
         # Remove values from blacklist
-        corrected_pair = [
-            idxs for idxs in corrected_pair if idxs not in blacklist
-        ]
+        corrected_pair = [idxs for idxs in corrected_pair if idxs not in blacklist]
 
         # Remove full negative pairs
         corrected_pair = [idxs for idxs in corrected_pair if idxs[1] > 0]
@@ -68,9 +65,7 @@ class ECGKnowledge(PostFilter):
 
         for pair in pairs:
             blacklist_status = pair in blacklist
-            labeled_pair.append(
-                {"pair": pair, "blacklist_status": blacklist_status}
-            )
+            labeled_pair.append({"pair": pair, "blacklist_status": blacklist_status})
 
         return labeled_pair
 

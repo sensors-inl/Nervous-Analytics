@@ -31,6 +31,7 @@ def test_Normalizer():
     )
 
 
+
 def test_PeakCleaner():
     check_type_and_length(pre.PeakCleaner(), pre.PeakCleaner)
 

@@ -1,16 +1,16 @@
-from nervous_analytics.PhysioPrediction import PhysioPrediction
+from nervous_analytics.physio_prediction import PhysioPrediction
 from nervous_analytics.postprocessing import (
-    Threshold,
+    EdgeCutter,
     PostProcess,
     SCRSegmenter,
-    EdgeCutter,
+    Threshold,
 )
 from nervous_analytics.preprocessing import (
-    PreProcess,
-    PeakCleaner,
-    FreqFilter,
     Differentiator,
     FallSmoother,
+    FreqFilter,
+    PeakCleaner,
+    PreProcess,
 )
 
 
@@ -40,6 +40,4 @@ def get_eda_template() -> PhysioPrediction:
         ]
     )
 
-    return PhysioPrediction(
-        preprocess=preprocess, model_inference=None, postprocess=postprocess
-    )
+    return PhysioPrediction(preprocess=preprocess, model_inference=None, postprocess=postprocess)
