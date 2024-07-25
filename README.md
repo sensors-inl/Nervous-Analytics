@@ -5,9 +5,12 @@ The ECG process is mainly based on this [paper](https://doi.org/10.1016/j.eswa.2
 
 ## Installation
 
-```bash
-pip install nervous_analytics
-```
+> [!NOTE]
+> Requires python version 3.10, 3.11 or 3.12
+> ```bash
+> pip install nervous-analytics
+> ```
+
 
 ## Architecture
 
