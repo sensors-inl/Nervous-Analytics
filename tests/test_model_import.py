@@ -9,7 +9,7 @@ from nervous_analytics.modeling import get_custom_loss_items
 def check_model_import(model_name):
     base_path = os.path.dirname(os.path.abspath(__file__))
     package_directory = os.path.dirname(base_path)
-    print('')
+    print('e')
     path = os.path.join(
         package_directory,
         "nervous_analytics/template/trained_models",
