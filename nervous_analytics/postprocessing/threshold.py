@@ -52,13 +52,14 @@ class Threshold(PreFilter, PostFilter):
     def _adaptive_threshold_filter(self, data):
         a = min(data)
         b = max(data)
-        epsilon = 1e-3
         threshold = (a + b) / 2
+        epsilon = 1e-3
         old_rate = -1
         same_rate_count = 0
         current_rate = 0
 
         while abs(current_rate - self.non_zero_data_rate) > epsilon:
+            threshold = (a + b) / 2
             current_rate = np.average(data > threshold)
 
             if current_rate > self.non_zero_data_rate:
@@ -66,16 +67,17 @@ class Threshold(PreFilter, PostFilter):
             else:
                 b = threshold
 
-            threshold = (a + b) / 2
-
             if current_rate == old_rate:
                 same_rate_count += 1
-                if same_rate_count > 100:
+                print("same_rate_count:", same_rate_count)
+                if same_rate_count > 1000:
+                    print("coucou")
                     break
             else:
                 same_rate_count = 0
 
             old_rate = current_rate
+            print("current_rate:", current_rate)
 
         data[data < threshold] = 0
         return data
