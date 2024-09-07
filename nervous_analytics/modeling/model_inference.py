@@ -1,12 +1,13 @@
 from typing import Callable, Dict, Tuple
 
 import numpy as np
+from tensorflow.keras.models import Model
 
 
 class ModelInference:
     def __init__(
         self,
-        models_dico,
+        models_dico: Dict[str, Model],
         processing_pred_dico_func: Callable[[Dict], Tuple[str, list]],
     ):
         self.models_dico = models_dico

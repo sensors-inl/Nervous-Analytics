@@ -18,8 +18,9 @@ class PhysioPrediction:
         self.postprocess = postprocess
 
     def predict(self, input):
-        """:param input: [Python list / Numpy array] Array of input or single input
-        :return: [InferenceRec list] Array of InferenceRec containing each output for each process step
+        """
+        :param input: data to predict
+        :return: List or a single PredictionTracker
         """
         input = np.array(input)
         return_first = False
