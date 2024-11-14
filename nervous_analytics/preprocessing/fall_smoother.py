@@ -13,7 +13,7 @@ class FallSmoother(PreFilter):
         critical_minima = self._find_critical_minima(data)
         return self._get_interpolated_critical_minima(data, critical_minima)
 
-    def _find_critical_minima(self, data):
+    def _find_critical_minima(self,data):
         maxi_left_list = []
         maxi_right_list = []
         mini_list = [

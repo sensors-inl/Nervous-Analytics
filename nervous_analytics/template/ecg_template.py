@@ -74,6 +74,3 @@ def get_ecg_template() -> PhysioPrediction:
         model_inference=model_inference,
         postprocess=postprocess,
     )
-
-
-get_ecg_template()

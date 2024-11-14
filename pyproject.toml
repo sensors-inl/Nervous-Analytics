@@ -1,8 +1,11 @@
 [tool.poetry]
 name = "nervous-analytics"
 version = "0.1.0"
-description = "A package to extract ECG and EDA features localization in real-time."
-authors = ["Tristan Habémont", "Bertrand Massot <bertrand.massot@insa-lyon.fr>"]
+description = "Package implementing modular processes for real-time feature localization on ECG and EDA signals."
+authors = [
+    "Tristan Habémont",
+    "Bertrand Massot <bertrand.massot@insa-lyon.fr>"
+]
 license = "MIT"
 readme = "README.md"
 homepage = "https://github.com/INL-Biomedical-Sensor/Nervous-Analytics"
@@ -24,14 +27,16 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.2"
 pre-commit = "^3.7.1"
+ruff = "^0.4.2"
 
 [tool.setuptools.packages.find]
 exclude = ["tests"]
 
 [tool.ruff]
 line-length = 119
-target-version = "py312"
+target-version = "py310"
 lint.select = ["I", "E", "F", "C"]
+fix = true
 
 [build-system]
 requires = ["poetry-core"]
