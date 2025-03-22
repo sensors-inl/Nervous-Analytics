@@ -4,7 +4,6 @@ repos:
     hooks:
     -   id: check-added-large-files
         args: ['--maxkb=600']
-        exclude: '^nervous_analytics/template/trained_models/'
     -   id: check-yaml
     -   id: check-toml
     -   id: end-of-file-fixer

@@ -1,18 +1,8 @@
-from . import modeling, postprocessing, preprocessing, template
-from .physio_prediction import PhysioPrediction
-from .prediction_tracker import PredictionTracker
+from . import analyzers
 
 __all__ = (
     [
-        "preprocessing",
-        "postprocessing",
-        "modeling",
-        "template",
-        "PhysioPrediction",
-        "PredictionTracker",
+        "analyzers",
     ]
-    + preprocessing.__all__
-    + postprocessing.__all__
-    + modeling.__all__
-    + template.__all__
+    + analyzers.__all__
 )
