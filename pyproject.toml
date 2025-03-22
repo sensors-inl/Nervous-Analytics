@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nervous-analytics"
-version = "0.2.0"
+version = "0.2.1"
 description = "Package implementing modular processes for real-time feature localization on ECG and EDA signals."
 authors = [
     "Bertrand Massot <bertrand.massot@insa-lyon.fr>",
@@ -15,7 +15,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 numpy = ">=1.26.4"
 scipy = "^1.14.0"
 pandas = "^2.2.2"
@@ -32,7 +32,7 @@ pre-commit = "^3.7.1"
 ruff = "^0.4.2"
 
 [tool.poetry.scripts]
-ecg_analyzer_gui = "nervous_analytics.analyzers.ecg_analyzer_gui"
+ecg_analyzer_gui = "nervous_analytics.analyzers.ecg_analyzer_gui:run_gui"
 
 [tool.ruff]
 line-length = 119

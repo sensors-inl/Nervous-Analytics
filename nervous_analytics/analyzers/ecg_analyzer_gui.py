@@ -4,7 +4,7 @@ from tkinter import filedialog, messagebox, ttk
 
 import numpy as np
 import pandas as pd
-from ecg_analyzer import ECGAnalyzer
+from .ecg_analyzer import ECGAnalyzer
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
@@ -251,7 +251,10 @@ class ECGAnalyzerGUI:
         self.canvas.draw()
 
 
-if __name__ == "__main__":
+def run_gui():
     root = tk.Tk()
     app = ECGAnalyzerGUI(root)
     root.mainloop()
+
+if __name__ == "__main__":
+    run_gui()

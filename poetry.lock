@@ -688,7 +688,6 @@ files = [
 
 [package.dependencies]
 numpy = [
-    {version = ">=1.22.4", markers = "python_version < \"3.11\""},
     {version = ">=1.23.2", markers = "python_version == \"3.11\""},
     {version = ">=1.26.0", markers = "python_version >= \"3.12\""},
 ]
@@ -1301,5 +1300,5 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 
 [metadata]
 lock-version = "2.1"
-python-versions = "^3.10"
-content-hash = "4360027bf48dec5ed188b8272ad615d8618d3b1034a5478cca586ebd8a0a3433"
+python-versions = "^3.11"
+content-hash = "c59c630b5f8b0d9433617e79ca18e47a81c8fc1656b2c3bde6d0d2ce4e029fce"
