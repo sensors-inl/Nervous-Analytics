@@ -1,7 +1,7 @@
 from .ecg_analyzer import ECGAnalyzer
-from .ecg_analyzer_gui import ECGAnalyzerGUI
+import ecg_analyzer_gui
 
 __all__ = [
     "ECGAnalyzer",
-    "ECGAnalyzerGUI",
+    "ecg_analyzer_gui",
 ]
