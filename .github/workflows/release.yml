@@ -39,4 +39,4 @@ jobs:
 
       - name: 🚀 Publish to PyPI
         run: |
-          PYPI_TOKEN=${{ secrets.PYPI_TOKEN }} make publish
+          make publish
