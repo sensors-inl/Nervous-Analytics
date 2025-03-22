@@ -17,10 +17,12 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.10"
 numpy = "^1.26.4"
-tensorflow = "^2.16.2"
 scipy = "^1.14.0"
 pandas = "^2.2.2"
 PyWavelets = "^1.6.0"
+matplotlib = "^3.8.3"
+sleepecg = "^1.1.1"
+neurokit2 = "^0.2.9"
 
 [tool.poetry.group.dev]
 optional = true

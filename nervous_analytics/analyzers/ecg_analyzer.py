@@ -77,7 +77,7 @@ class ECGAnalyzer:
         self.previous_history_r_peak_idx = np.array([], dtype=float)
 
         self.history_rr = np.array([], dtype=float)
-        self.history_rr_timestamp = np.array([], dtype=float) 
+        self.history_rr_timestamp = np.array([], dtype=float)
 
         # Pre-allocate windows
         self.ecg_window = np.zeros(window_duration * fs, dtype=float)
@@ -99,7 +99,7 @@ class ECGAnalyzer:
         self.history_r_peak_idx = np.array([], dtype=float)
         self.previous_history_r_peak_idx = np.array([], dtype=float)
         self.history_rr = np.array([], dtype=float)
-        self.history_rr_timestamp = np.array([], dtype=float) 
+        self.history_rr_timestamp = np.array([], dtype=float)
         self.ecg_window = np.zeros(self.window_duration * self.fs, dtype=np.float32)
         self.time_window = np.linspace(
             -(self.window_duration * self.fs - 1) / self.fs, 0, self.window_duration * self.fs
@@ -339,12 +339,10 @@ class ECGAnalyzer:
 
         # Find new peaks
         if len(self.previous_history_r_peak_idx) > 0:
-            new_r_peaks_idx = self.history_r_peak_idx[
-                self.history_r_peak_idx > self.previous_history_r_peak_idx[-1]
-            ]
+            new_r_peaks_idx = self.history_r_peak_idx[self.history_r_peak_idx > self.previous_history_r_peak_idx[-1]]
         else:
             new_r_peaks_idx = self.history_r_peak_idx
-            
+
         if len(new_r_peaks_idx) == 0:
             self.previous_history_r_peak_idx = self.history_r_peak_idx.copy()
             return None, None
@@ -362,7 +360,7 @@ class ECGAnalyzer:
         # Define physiological bounds for heart rate (30-200 BPM)
         min_interval = 0.3  # 200 BPM max
         max_interval = 2.0  # 30 BPM min
-        
+
         # Threshold for sudden changes (±30% change)
         change_threshold = 0.428  # Derived from 1 - 1/(1+0.3) ≈ 0.428
 
@@ -383,7 +381,9 @@ class ECGAnalyzer:
 
                 # Don't get heart rate if interval is too long (Heart Rate decrease more than 30%)
                 if (interval - sd_median) / sd_median > change_threshold:
-                    logger.debug(f"peak too long at {new_r_peaks_idx[i]} median is {sd_median} value got is {interval}")
+                    logger.debug(
+                        f"peak too long at {new_r_peaks_idx[i]} median is {sd_median} value got is {interval}"
+                    )
                     i = i + 1
                     continue
 
@@ -391,7 +391,7 @@ class ECGAnalyzer:
                 if (interval < min_interval) or (interval > max_interval):
                     i = i + 1
                     continue
-                
+
                 # Add valid interval to RR list
                 rr.append(interval)
                 rr_timestamp.append(round(float(new_r_peaks_idx[i]), 3))
@@ -421,16 +421,16 @@ class ECGAnalyzer:
                 heart_rate.append(round(float(60.0 / interval), 2))
                 heart_rate_timestamp.append(round(float(new_r_peaks_idx[i]), 3))
                 i = i + 1
-        
+
         # Safety check for empty results
         if not rr:
             self.previous_history_r_peak_idx = self.history_r_peak_idx.copy()
             return None, None
-        
+
         # Update rr history
         self.history_rr = np.concatenate([self.history_rr, np.array(rr)])
-        self.history_rr_timestamp = np.concatenate([self.history_rr_timestamp, np.array(rr_timestamp)]) 
-        
+        self.history_rr_timestamp = np.concatenate([self.history_rr_timestamp, np.array(rr_timestamp)])
+
         # Trim RR history to maintain time window
         while len(self.history_rr_timestamp) > 1 and (
             self.history_rr_timestamp[-1] - self.history_rr_timestamp[0] > self.history_size
@@ -456,8 +456,8 @@ class ECGAnalyzer:
             time_data (array-like): Corresponding timestamps
 
         Returns:
-            tuple: (heart_rate, heart_rate_timestamp, r_peak_timestamp) 
-                  Lists of calculated heart rates, corresponding timestamps, and 
+            tuple: (heart_rate, heart_rate_timestamp, r_peak_timestamp)
+                  Lists of calculated heart rates, corresponding timestamps, and
                   detected R-peak timestamps. Returns (None, None, None) if no valid heart rates.
         """
         # Input type conversion and validation
@@ -472,7 +472,7 @@ class ECGAnalyzer:
             start_idx = np.argmax(time_data > 0)
             ecg_data = ecg_data[start_idx:]
             time_data = time_data[start_idx:]
-            
+
             # If all time data was negative, return
             if ecg_data.size == 0 or time_data.size == 0:
                 return None, None, None
@@ -484,10 +484,10 @@ class ECGAnalyzer:
 
         # Update sliding windows
         self.ecg_window = np.roll(self.ecg_window, -len(ecg_data))
-        self.ecg_window[-len(ecg_data):] = ecg_data
+        self.ecg_window[-len(ecg_data) :] = ecg_data
 
         self.time_window = np.roll(self.time_window, -len(time_data))
-        self.time_window[-len(time_data):] = time_data
+        self.time_window[-len(time_data) :] = time_data
 
         # Pan-Tompkins filtering
         filtered_ecg = self._pan_tompkins_filter(self.ecg_window)
@@ -516,8 +516,8 @@ class ECGAnalyzer:
                 r_peaks_pt = np.intersect1d(r_peaks_pt, r_peaks_se)
             elif r_peaks_se.size > 0:
                 r_peaks_pt = r_peaks_se
-                
-            if r_peaks_pt.size > 0 and r_peaks_nk.size > 0:    
+
+            if r_peaks_pt.size > 0 and r_peaks_nk.size > 0:
                 r_peaks_pt = np.intersect1d(r_peaks_pt, r_peaks_nk)
             elif r_peaks_nk.size > 0 and r_peaks_pt.size == 0:
                 r_peaks_pt = r_peaks_nk
@@ -544,4 +544,3 @@ class ECGAnalyzer:
             return None, None, r_peak_timestamp
         else:
             return heart_rate, heart_rate_timestamp, r_peak_timestamp
-        
