@@ -18,13 +18,13 @@ Example usage:
     heart_rate, timestamps, r_peak_timestamps = analyzer.update_hr(ecg_data, time_data)
 """
 
-import numpy as np
-from scipy.signal import butter, filtfilt, find_peaks
-import pywt
 import logging
-import matplotlib.pyplot as plt
-import sleepecg
+
 import neurokit2
+import numpy as np
+import pywt
+import sleepecg
+from scipy.signal import butter, filtfilt, find_peaks
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
@@ -155,13 +155,8 @@ class ECGAnalyzer:
         # Wavelet decomposition
         coeffs = pywt.wavedec(signal, wavelet, level=level)
 
-        # Adaptive noise estimation
-        sigma = np.median(np.abs(coeffs[-1])) / 0.6745
-
         # Multi-level thresholding
         for i in range(len(coeffs)):
-            # Dynamic thresholding based on coefficient level
-            threshold = sigma * np.sqrt(2 * np.log(len(signal)))
             # Soft thresholding for detail coefficients
             if i < 2:
                 coeffs[i] = pywt.threshold(coeffs[i], 2000, mode="hard")

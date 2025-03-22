@@ -1,13 +1,12 @@
 import os
-import sys
+import tkinter as tk
+from tkinter import filedialog, messagebox, ttk
+
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
-import tkinter as tk
-from tkinter import filedialog, ttk, messagebox
 from ecg_analyzer import ECGAnalyzer
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+from matplotlib.figure import Figure
 
 
 class ECGAnalyzerGUI:
