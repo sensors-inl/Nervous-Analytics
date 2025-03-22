@@ -168,7 +168,7 @@ class ECGAnalyzerGUI:
                 # Update progress
                 progress_pct = min(100, (i // window_size) / total_windows * 100)
                 self.progress_value.set(progress_pct)
-                self.status_text.set(f"Processing window {i//window_size + 1}/{total_windows}...")
+                self.status_text.set(f"Processing window {i // window_size + 1}/{total_windows}...")
                 self.root.update()
 
                 # Get window data
@@ -255,6 +255,7 @@ def run_gui():
     root = tk.Tk()
     app = ECGAnalyzerGUI(root)
     root.mainloop()
+
 
 if __name__ == "__main__":
     run_gui()
