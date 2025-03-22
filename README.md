@@ -31,7 +31,7 @@
 ## Project Overview
 
 Nervous Analytics is a comprehensive Python toolbox for physiological signals processing, such as electrocardiogram (ECG) or electrodermal activity (EDA).
-It is intended to be used for real-time processing of signals as well as 
+It is intended to be used for real-time processing of signals as well as
 off-line analysis.
 
 ---
