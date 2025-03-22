@@ -16,7 +16,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.10"
-numpy = "^1.26.4"
+numpy = ">=1.26.4"
 scipy = "^1.14.0"
 pandas = "^2.2.2"
 PyWavelets = "^1.6.0"
@@ -30,6 +30,9 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.7.1"
 ruff = "^0.4.2"
+
+[tool.poetry.scripts]
+ecg_analyzer_gui = "nervous_analytics.analyzers.ecg_analyzer_gui"
 
 [tool.ruff]
 line-length = 119
