@@ -5,7 +5,7 @@ description = "Package implementing modular processes for real-time feature loca
 authors = [
     {name = "Bertrand Massot", email = "bertrand.massot@insa-lyon.fr"},
     {name = "Matthieu Mesnage"},
-    {name = "Tristan Habemont"},
+    {name = "Tristan Habemont"}
 ]
 license = "MIT"
 readme = "README.md"
@@ -20,7 +20,7 @@ dependencies = [
     "PyWavelets>=1.6.0",
     "matplotlib>=3.8.3",
     "sleepecg>=0.5.9",
-    "neurokit2>=0.2.9",
+    "neurokit2>=0.2.9"
 ]
 
 [project.urls]
