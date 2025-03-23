@@ -1,7 +1,3 @@
-.PHONY: setup
-setup:
-	poetry config virtualenvs.in-project true
-
 .PHONY: install-main
 install-main:
 	poetry install --only main
