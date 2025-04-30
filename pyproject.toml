@@ -1,6 +1,6 @@
 [project]
 name = "nervous-analytics"
-version = "0.2.6"
+version = "0.3.0"
 description = "Package implementing modular processes for real-time feature localization on ECG and EDA signals."
 authors = [
     {name = "Bertrand Massot", email = "bertrand.massot@insa-lyon.fr"},
@@ -20,14 +20,16 @@ dependencies = [
     "PyWavelets>=1.6.0",
     "matplotlib>=3.8.3",
     "sleepecg>=0.5.9",
-    "neurokit2>=0.2.9"
+    "neurokit2>=0.2.9",
+    "openpyxl (>=3.1.5,<4.0.0)"
 ]
 
 [project.urls]
 repository = "https://github.com/sensors-inl/Nervous-Sensors"
 
 [project.scripts]
-ecg_analyzer_gui = "nervous_analytics.analyzers.ecg_analyzer_gui:run_gui"
+nervous_ecg_analyzer = "nervous_analytics.analyzers.ecg_analyzer_gui:run_gui"
+nervous_eda_analyzer = "nervous_analytics.analyzers.eda_analyzer_gui:run_gui"
 
 [tool.poetry.group.dev]
 optional = true

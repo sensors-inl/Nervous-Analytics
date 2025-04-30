@@ -52,7 +52,10 @@ pip install nervous-analytics
 
 ```bash
 # Launch the GUI for offline analysis of ECG signal
+nervous_ecg_analyzer
 
+# Launch the GUI for offline analysis of EDA signal
+nervous_eda_analyzer
 ```
 
 ---
