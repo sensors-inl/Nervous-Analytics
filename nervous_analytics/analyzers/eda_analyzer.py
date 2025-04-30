@@ -630,7 +630,7 @@ class EDAAnalyzer:
             level_scr (list): The level of the skin conductance response at each minimum peak.
             timestamp (list): The timestamp (index) of the minimum peaks.
             after_slope (list): The slope of the EDA signal after the maximum peak.
-            coeffcubicA, coeffcubicB, coeffcubicC, coeffcubicD (lists): Coefficients for polynomial 
+            coeffcubicA, coeffcubicB, coeffcubicC, coeffcubicD (lists): Coefficients for polynomial
                                                                         interpolation of order 3 for each response.
             x_curve_interpolate (list): List of x-values used to plot the interpolated curve for each response.
             y_curve_interpolate (list): List of y-values used to plot the interpolated curve for each response.
@@ -818,7 +818,7 @@ class EDAAnalyzer:
             eda_window (np.array): Array containing the EDA values over time.
 
         Returns:
-            np.array, np.array: Two arrays, one for the values at the minimum peak 
+            np.array, np.array: Two arrays, one for the values at the minimum peak
                                 indices and another for the values at the maximum peak indices.
         """
 
@@ -860,7 +860,7 @@ class EDAAnalyzer:
             time_data (array-like): Corresponding timestamps.
 
         Returns:
-            tuple: (amplitude_tosend, duration_tosend, levelSCR_tosend, 
+            tuple: (amplitude_tosend, duration_tosend, levelSCR_tosend,
                     timestamp_tosend, x_curve_tosend, y_curve_tosend)
                 Lists of localized EDA response data to be sent, or empty lists if no valid EDA responses are detected.
         """

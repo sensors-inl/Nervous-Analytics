@@ -47,20 +47,20 @@ def predict(x, model="embc2025"):
     All input values are multiplied by 10000 before being used in the decision logic.
     """
     # Index mapping for improved readability
-    #Amplitude = x[0] * 10000
+    # Amplitude = x[0] * 10000
     Duration = x[1] * 10000
     LevelSCR = x[2] * 10000
-    #Pente = x[3] * 10000
+    # Pente = x[3] * 10000
     A_Level = x[4] * 10000
     x_A_Level__Duration = x[5] * 10000
-    #Cubic_B_x_2 = x[6] * 10000
+    # Cubic_B_x_2 = x[6] * 10000
     Cubic_A_x_3 = x[7] * 10000
     SlopeAfter = x[8] * 10000
-    #Pente_Pt_Inflexion = x[9] * 10000
-    #Cubic_A_B = x[10] * 10000
-    #Squared_B_x = x[11] * 10000
-    #Squared_A_x_2 = x[12] * 10000
-    #Squared_A_B = x[13] * 10000
+    # Pente_Pt_Inflexion = x[9] * 10000
+    # Cubic_A_B = x[10] * 10000
+    # Squared_B_x = x[11] * 10000
+    # Squared_A_x_2 = x[12] * 10000
+    # Squared_A_B = x[13] * 10000
 
     # Select the appropriate model based on model_name
     if model == "embc2025":

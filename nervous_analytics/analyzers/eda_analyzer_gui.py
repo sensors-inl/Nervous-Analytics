@@ -366,7 +366,7 @@ class EDAAnalysisApp:
                 amplitude = row["amplitude"]
 
                 # Find closest index in original data
-                #closest_idx = np.abs(self.data[self.time_col_var.get()] - timestamp).argmin()
+                # closest_idx = np.abs(self.data[self.time_col_var.get()] - timestamp).argmin()
 
                 # Mark minimum point
                 ax1.plot(timestamp, level, "ro", markersize=5)
