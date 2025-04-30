@@ -17,14 +17,14 @@ Example usage:
     amplitude, duration, levelSCR, timestamp, = analyzer.update_eda_peak(eda_data, time_data)
 """
 
-import neurokit2 as nk
-import numpy as np
-from . import eda_decisiontree
-from scipy.signal import filtfilt, savgol_coeffs, butter
 import logging
-import matplotlib.pyplot as plt
-from scipy.optimize import minimize
+
+import numpy as np
 from scipy.linalg import solve
+from scipy.optimize import minimize
+from scipy.signal import butter, filtfilt, savgol_coeffs
+
+from . import eda_decisiontree
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s: %(message)s")
@@ -599,7 +599,7 @@ class EDAAnalyzer:
                 if result.fun < best_error:
                     best_error = result.fun
                     best_result = result
-            except:
+            except Exception:
                 continue
 
         # Check if the optimization result is successful
@@ -615,7 +615,7 @@ class EDAAnalyzer:
             coeffs = solve(A, key_points[:, 1])
             self.previous_coeffs = coeffs
             return coeffs
-        except:
+        except Exception:
             # Last resort: simple linear polynomial as fallback
             return [0, 0, (y2 - y1) / (x2 - x1), y1 - (y2 - y1) / (x2 - x1) * x1]
 
@@ -630,7 +630,8 @@ class EDAAnalyzer:
             level_scr (list): The level of the skin conductance response at each minimum peak.
             timestamp (list): The timestamp (index) of the minimum peaks.
             after_slope (list): The slope of the EDA signal after the maximum peak.
-            coeffcubicA, coeffcubicB, coeffcubicC, coeffcubicD (lists): Coefficients for polynomial interpolation of order 3 for each response.
+            coeffcubicA, coeffcubicB, coeffcubicC, coeffcubicD (lists): Coefficients for polynomial 
+                                                                        interpolation of order 3 for each response.
             x_curve_interpolate (list): List of x-values used to plot the interpolated curve for each response.
             y_curve_interpolate (list): List of y-values used to plot the interpolated curve for each response.
         """
@@ -817,7 +818,8 @@ class EDAAnalyzer:
             eda_window (np.array): Array containing the EDA values over time.
 
         Returns:
-            np.array, np.array: Two arrays, one for the values at the minimum peak indices and another for the values at the maximum peak indices.
+            np.array, np.array: Two arrays, one for the values at the minimum peak 
+                                indices and another for the values at the maximum peak indices.
         """
 
         empty_array = np.array([], dtype=float)
@@ -858,7 +860,8 @@ class EDAAnalyzer:
             time_data (array-like): Corresponding timestamps.
 
         Returns:
-            tuple: (amplitude_tosend, duration_tosend, levelSCR_tosend, timestamp_tosend, x_curve_tosend, y_curve_tosend)
+            tuple: (amplitude_tosend, duration_tosend, levelSCR_tosend, 
+                    timestamp_tosend, x_curve_tosend, y_curve_tosend)
                 Lists of localized EDA response data to be sent, or empty lists if no valid EDA responses are detected.
         """
         empty_array = np.array([], dtype=float)
@@ -919,7 +922,8 @@ class EDAAnalyzer:
         # idx_SCR_Onset = np.array(features[0])
         # idx_SCR_Peaks = np.array(features[1])
         # idx_SCR_Onset, idx_SCR_Peaks = self._edge_removal(idx_SCR_Onset, idx_SCR_Peaks, 1)
-        # eda_peaks_min_idx,eda_peaks_max_idx,idx_SCR_Onset,idx_SCR_Peaks = self._intersection(eda_peaks_min_idx,eda_peaks_max_idx,idx_SCR_Onset,idx_SCR_Peaks)
+        # eda_peaks_min_idx,eda_peaks_max_idx,idx_SCR_Onset,idx_SCR_Peaks = self._intersection(eda_peaks_min_idx,
+        # eda_peaks_max_idx,idx_SCR_Onset,idx_SCR_Peaks)
 
         # Get the values of the detected peaks from the EDA signal
         eda_peaks_min_val, eda_peaks_max_val = self._get_eda_values(eda_peaks_min_idx, eda_peaks_max_idx, smooth_eda)

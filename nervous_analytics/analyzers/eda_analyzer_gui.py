@@ -1,13 +1,13 @@
-import tkinter as tk
-from tkinter import filedialog, ttk, messagebox
-import pandas as pd
-import numpy as np
 import os
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import sys
 import threading
+import tkinter as tk
 from datetime import datetime
+from tkinter import filedialog, messagebox, ttk
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 from .eda_analyzer import EDAAnalyzer
 
 
@@ -231,7 +231,7 @@ class EDAAnalysisApp:
         time_col = self.time_col_var.get()
 
         if eda_col not in self.data.columns or time_col not in self.data.columns:
-            messagebox.showerror("Error", f"Specified columns do not exist in the CSV file")
+            messagebox.showerror("Error", "Specified columns do not exist in the CSV file")
             return
 
         # Disable buttons during analysis
@@ -308,7 +308,8 @@ class EDAAnalysisApp:
             # Create and display the graph
             self.root.after(0, self._plot_results)
 
-        except Exception as e:
+        except Exception as error:
+            e = error
             self.root.after(0, lambda: messagebox.showerror("Analysis Error", str(e)))
             self.root.after(0, lambda: self.status_var.set(f"Error: {str(e)}"))
         finally:
@@ -365,7 +366,7 @@ class EDAAnalysisApp:
                 amplitude = row["amplitude"]
 
                 # Find closest index in original data
-                closest_idx = np.abs(self.data[self.time_col_var.get()] - timestamp).argmin()
+                #closest_idx = np.abs(self.data[self.time_col_var.get()] - timestamp).argmin()
 
                 # Mark minimum point
                 ax1.plot(timestamp, level, "ro", markersize=5)
