@@ -1,6 +1,6 @@
 [project]
 name = "nervous-analytics"
-version = "0.3.1"
+version = "0.3.2"
 description = "Package implementing modular processes for real-time feature localization on ECG and EDA signals."
 authors = [
     {name = "Bertrand Massot", email = "bertrand.massot@insa-lyon.fr"},
