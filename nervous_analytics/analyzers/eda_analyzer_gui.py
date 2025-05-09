@@ -74,13 +74,20 @@ class EDAAnalysisApp:
             row=2, column=1, padx=5, pady=2
         )
 
+        # Parameter batch_size_seconds
+        ttk.Label(param_frame, text="Batch Size (s):").grid(row=3, column=0, sticky=tk.W)
+        self.batch_size_seconds_var = tk.DoubleVar(value=5.0)
+        ttk.Spinbox(
+            param_frame, from_=0.1, to=60.0, increment=0.1, textvariable=self.batch_size_seconds_var, width=5
+        ).grid(row=3, column=1, padx=5, pady=2)
+
         # CSV Columns
         ttk.Label(param_frame, text="EDA Column:").grid(row=0, column=2, sticky=tk.W, padx=(20, 0))
-        self.eda_col_var = tk.StringVar(value="eda")
+        self.eda_col_var = tk.StringVar(value="EDA (uS)")
         ttk.Entry(param_frame, textvariable=self.eda_col_var, width=15).grid(row=0, column=3, padx=5, pady=2)
 
         ttk.Label(param_frame, text="Time Column:").grid(row=1, column=2, sticky=tk.W, padx=(20, 0))
-        self.time_col_var = tk.StringVar(value="time")
+        self.time_col_var = tk.StringVar(value="Time (s)")
         ttk.Entry(param_frame, textvariable=self.time_col_var, width=15).grid(row=1, column=3, padx=5, pady=2)
 
         # Notebook to display data and results
@@ -251,12 +258,19 @@ class EDAAnalysisApp:
             fs = self.fs_var.get()
             window_duration = self.window_var.get()
             history_size = self.history_var.get()
+            batch_size_seconds = self.batch_size_seconds_var.get()
 
             self.analyzer = EDAAnalyzer(fs=fs, window_duration=window_duration, history_size=history_size)
 
             # Extract EDA and time data
             eda_data = self.data[eda_col].values
             time_data = self.data[time_col].values
+
+            # Calculate batch size in samples based on frequency and seconds
+            batch_size_samples = int(batch_size_seconds * fs)
+
+            # Make sure batch size is at least 1 sample
+            batch_size_samples = max(1, batch_size_samples)
 
             # Initialize lists to store results
             all_amplitudes = []
@@ -265,16 +279,15 @@ class EDAAnalysisApp:
             all_timestamps = []
 
             # Process data in batches to show progress
-            batch_size = min(40, len(eda_data))
-            num_batches = len(eda_data) // batch_size + (1 if len(eda_data) % batch_size > 0 else 0)
+            num_batches = len(eda_data) // batch_size_samples + (1 if len(eda_data) % batch_size_samples > 0 else 0)
 
             for i in range(num_batches):
                 # Update progress
                 self.root.after(0, lambda val=int((i / num_batches) * 100): self.progress.config(value=val))
 
                 # Calculate indices for this batch
-                start_idx = i * batch_size
-                end_idx = min((i + 1) * batch_size, len(eda_data))
+                start_idx = i * batch_size_samples
+                end_idx = min((i + 1) * batch_size_samples, len(eda_data))
 
                 # Process this batch of data
                 batch_eda = eda_data[start_idx:end_idx]
@@ -346,12 +359,8 @@ class EDAAnalysisApp:
         for widget in self.plot_frame.winfo_children():
             widget.destroy()
 
-        if self.results is None or self.results.empty:
-            # No data to display
-            return
-
-        # Create figure with two subplots
-        fig, (ax1) = plt.subplots(1, 1, figsize=(10, 8))
+        # Create figure with one subplot
+        fig, ax1 = plt.subplots(1, 1, figsize=(10, 8))
 
         # Graph 1: Raw EDA signal with detected peaks
         ax1.plot(
@@ -364,9 +373,6 @@ class EDAAnalysisApp:
                 timestamp = row["timestamp"]
                 level = row["level_scr"]
                 amplitude = row["amplitude"]
-
-                # Find closest index in original data
-                # closest_idx = np.abs(self.data[self.time_col_var.get()] - timestamp).argmin()
 
                 # Mark minimum point
                 ax1.plot(timestamp, level, "ro", markersize=5)

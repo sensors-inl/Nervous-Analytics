@@ -65,6 +65,9 @@ class EDAAnalyzer:
             window_duration (int): Duration of analysis window in seconds
             history_size (int): Size of peak history in seconds
         """
+        if window_duration < 5:
+            logging.error("Window duration must be higher than 5 seconds")
+
         self.fs = fs
         self.window_duration = window_duration
         self.history_size = history_size
@@ -141,7 +144,7 @@ class EDAAnalyzer:
         Apply a Savitzky-Golay filter to smooth an EDA signal.
 
         This method uses precomputed Savitzky-Golay filter coefficients to smooth the input signal.
-        In case of an error during filtering, the original signal is returned and the error is logged.
+        It handles specific error cases with appropriate recovery strategies.
 
         Parameters:
             eda_signal (ndarray): Raw EDA signal to be smoothed.
@@ -149,54 +152,46 @@ class EDAAnalyzer:
         Returns:
             ndarray: Smoothed EDA signal. If an error occurs, returns the original signal.
         """
+        # Validation d'entrée
+        if eda_signal is None or len(eda_signal) == 0:
+            logger.warning("Empty EDA signal received in Savitzky-Golay filter, returning empty array")
+            return np.array([], dtype=float)
+
+        if len(eda_signal) < 8:  # Valeur minimale pour le filtre (taille du fenêtrage)
+            logger.warning(
+                f"EDA signal too short for Savitzky-Golay filtering: {len(eda_signal)} samples."
+                + "Returning original signal."
+            )
+            return eda_signal
+
         try:
             # Smooth the signal via Savitzky Golay Filter
             sav_gol_signal = self._apply_filter(eda_signal, self.savitzky_golay_coeffs)
+
+            # Vérification des valeurs NaN ou infinies dans le résultat
+            if np.any(np.isnan(sav_gol_signal)) or np.any(np.isinf(sav_gol_signal)):
+                logger.warning("Savitzky-Golay filter produced NaN or infinite values. Using original signal instead.")
+                return eda_signal
+
             return sav_gol_signal
 
-        except Exception as e:
-            logger.error(f"Savitsky Golay filter error: {e}")
+        except ValueError as e:
+            logger.error(f"Savitzky-Golay parameter error: {e}. Check window length and polynomial order.")
             return eda_signal
-
-    def _edge_removal(self, peaks_min, peaks_max, edge_time):
-        """
-        Remove peaks detected near the edges of the analysis window
-
-        Peaks detected near the edges of the window are more likely to be artifacts
-        or incomplete waveforms. This method removes peaks that are within a specified
-        distance from the window edges.
-
-        Parameters:
-            peaks_min (ndarray): Indices of detected minimum peaks
-            peaks_max (ndarray): Indices of detected maximum peaks
-            edge_time (float): Time in seconds to exclude from edges
-
-        Returns:
-            tuple: Updated lists of peaks_min and peaks_max with filtered indices
-        """
-        emptyArray = np.array([], dtype=float)
-
-        if len(peaks_min) == 0 or len(peaks_max) == 0:
-            return emptyArray, emptyArray
-
-        # Convert edge_time to indices
-        edge_indices = edge_time * self.fs
-
-        # Apply the edge condition for both peaks_min and peaks_max
-        valid_mask = (peaks_min > edge_indices) & (peaks_max < (self.window_duration - edge_time) * self.fs)
-
-        # Filter both peaks_min and peaks_max according to the valid mask
-        peaks_min_filtered = peaks_min[valid_mask]
-        peaks_max_filtered = peaks_max[valid_mask]
-
-        return peaks_min_filtered, peaks_max_filtered
+        except np.linalg.LinAlgError as e:
+            logger.error(f"Savitzky-Golay linear algebra error: {e}. Signal might contain problematic patterns.")
+            return eda_signal
+        except Exception as e:
+            logger.error(f"Unexpected error in Savitzky-Golay filter: {e}")
+            return eda_signal
 
     def _detect_eda_peaks(self, filtered_eda):
         """
-        Detect positive and negative peaks in a filtered EDA signal.
+        Detect positive and negative peaks in a filtered EDA signal, excluding the first and last 2.5 seconds.
 
         Identifies zero-crossings in the signal's derivative to detect local minima and maxima.
         Classifies each zero-crossing as a peak or a trough based on the signal's slope direction.
+        Analysis focuses on the central region of the signal, excluding the first and last 20 samples.
         In case of an error during peak detection, logs the error and returns empty arrays.
 
         Parameters:
@@ -207,92 +202,64 @@ class EDAAnalyzer:
                 - min_peak_idx (list): Indices of detected minima (troughs).
                 - max_peak_idx (list): Indices of detected maxima (peaks).
         """
+        # Validation d'entrée
+        if filtered_eda is None:
+            logger.error("Received None as filtered_eda in peak detection")
+            return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
+
+        if len(filtered_eda) < 41:  # Besoin d'au moins 41 points pour exclure 20 de chaque côté
+            logger.warning(f"Signal too short for peak detection: {len(filtered_eda)} samples")
+            return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
+
         try:
             min_peak_idx = []
             max_peak_idx = []
 
-            # Detect Variation Changement
-            idx = np.where(filtered_eda[:-1] * filtered_eda[1:] < 0)[0] + 1
-            idx = idx.tolist()
+            # Define borders to exclude (first and last 20 samples, approximately 2.5s)
+            start_idx = round(2.5 * self.fs)
+            end_idx = len(filtered_eda) - round(2.5 * self.fs)
+
+            # Only process the central part of the signal
+            central_signal = filtered_eda[start_idx:end_idx]
+
+            if len(central_signal) <= 1:
+                logger.warning("Central signal too short after border exclusion")
+                return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
+
+            # Detect Variation Changement in the central region
+            try:
+                # Détection sécurisée des changements de signe (zéro-crossings)
+                idx = np.where(central_signal[:-1] * central_signal[1:] < 0)[0] + 1
+                idx = idx.tolist()
+            except IndexError as e:
+                logger.error(f"Index error during zero-crossing detection: {e}")
+                return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
 
             # Check if it's a max or a min
             for i in idx:
-                if filtered_eda[i - 1] < 0:
-                    min_peak_idx.append(i)
-                elif filtered_eda[i - 1] > 0:
-                    max_peak_idx.append(i)
+                if i >= len(central_signal):
+                    logger.warning(f"Index {i} out of bounds for central_signal length {len(central_signal)}")
+                    continue
 
-            return min_peak_idx, max_peak_idx
+                # Adjust index to reference the original signal
+                orig_idx = i + start_idx
 
-        except Exception as e:
-            logger.error(f"EDA-peak detection error: {e}")
+                if central_signal[i - 1] < 0:
+                    min_peak_idx.append(orig_idx)
+                elif central_signal[i - 1] > 0:
+                    max_peak_idx.append(orig_idx)
+
+            return np.array(min_peak_idx, dtype=np.int64), np.array(max_peak_idx, dtype=np.int64)
+
+        except IndexError as e:
+            logger.error(f"Index error in EDA peak detection: {e}")
             return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
-
-    # def _intersection(self, algo1_min, algo1_max, algo2_min, algo2_max, max_diff=2):
-    #         """
-    #         Trouve les correspondances entre les plages min-max de deux algorithmes.
-    #         Fonctionne avec des numpy arrays.
-
-    #         Args:
-    #             algo1_min: Array des valeurs minimales du premier algorithme
-    #             algo1_max: Array des valeurs maximales du premier algorithme
-    #             algo2_min: Array des valeurs minimales du deuxième algorithme
-    #             algo2_max: Array des valeurs maximales du deuxième algorithme
-    #             max_diff: Écart maximum autorisé (défaut: 2)
-
-    #         Returns:
-    #             Quatre numpy arrays modifiés correspondant aux plages correspondantes
-    #         """
-    #         # Vérifier que les paires min-max ont la même longueur dans chaque algorithme
-    #         if len(algo1_min) != len(algo1_max) or len(algo2_min) != len(algo2_max):
-    #             raise ValueError("Les arrays min et max doivent avoir la même longueur pour chaque algorithme")
-
-    #         # Listes pour stocker les indices des résultats
-    #         indices_algo1 = []
-    #         indices_algo2 = []
-
-    #         # Pour chaque paire min-max dans algo1
-    #         for i in range(len(algo1_min)):
-    #             min1 = algo1_min[i]
-    #             max1 = algo1_max[i]
-
-    #             best_match_idx = None
-    #             best_match_diff = float('inf')
-
-    #             # Chercher la meilleure correspondance dans algo2
-    #             for j in range(len(algo2_min)):
-    #                 # Vérifier si cet indice de algo2 a déjà été utilisé
-    #                 if j in indices_algo2:
-    #                     continue
-
-    #                 min2 = algo2_min[j]
-    #                 max2 = algo2_max[j]
-
-    #                 # Calculer la différence pour min et max
-    #                 min_diff = abs(min1 - min2)
-    #                 max_diff_val = abs(max1 - max2)
-
-    #                 # Si les deux différences sont dans la limite
-    #                 if min_diff <= max_diff and max_diff_val <= max_diff:
-    #                     total_diff = min_diff + max_diff_val
-
-    #                     # Si c'est une meilleure correspondance que ce qu'on a trouvé jusqu'à présent
-    #                     if total_diff < best_match_diff:
-    #                         best_match_diff = total_diff
-    #                         best_match_idx = j
-
-    #             # Si on a trouvé une correspondance
-    #             if best_match_idx is not None:
-    #                 indices_algo1.append(i)
-    #                 indices_algo2.append(best_match_idx)
-
-    #         # Créer les nouveaux arrays en utilisant les indices trouvés
-    #         new_algo1_min = algo1_min[indices_algo1]
-    #         new_algo1_max = algo1_max[indices_algo1]
-    #         new_algo2_min = algo2_min[indices_algo2]
-    #         new_algo2_max = algo2_max[indices_algo2]
-
-    #         return new_algo1_min, new_algo1_max, new_algo2_min, new_algo2_max
+        except ValueError as e:
+            logger.error(f"Value error in EDA peak detection: {e}")
+            return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
+        except Exception as e:
+            logger.error(f"Unexpected error in EDA peak detection: {e}")
+            return np.array([], dtype=np.int64), np.array([], dtype=np.int64)
 
     def _filter_indices(self, values, min_idx, max_idx, value_threshold, time_threshold, slope_threshold):
         """
@@ -682,7 +649,6 @@ class EDAAnalyzer:
 
         # Process each new peak
         for i in range(len(new_eda_max_peaks_idx)):
-            # Calculate amplitude and duration for each peak
             value = round((new_eda_max_peaks_value[i] - new_eda_min_peaks_value[i]), 3)
             dt = round((new_eda_max_peaks_idx[i] - new_eda_min_peaks_idx[i]), 3)
 
@@ -690,112 +656,80 @@ class EDAAnalyzer:
             duration.append(dt)
             level_scr.append(round(new_eda_min_peaks_value[i], 3))
             timestamp.append(round(new_eda_min_peaks_idx[i], 3))
+
+            indice_max_peak = np.where(
+                (self.time_window >= (new_eda_max_peaks_idx[i] - 1 / (self.fs * 2)))
+                & (self.time_window <= (new_eda_max_peaks_idx[i] + 1 / (self.fs * 2)))
+            )[0]
+            indice_min_peak = np.where(
+                (self.time_window >= (new_eda_min_peaks_idx[i] - 1 / (self.fs * 2)))
+                & (self.time_window <= (new_eda_min_peaks_idx[i] + 1 / (self.fs * 2)))
+            )[0]
+            indice_max_peak = int(indice_max_peak[0])
+            indice_min_peak = int(indice_min_peak[0])
+
             after_slope.append(
                 2
                 * round(
-                    self.eda_window[int(round((new_eda_max_peaks_idx[i] + 0.5) * 8.0 - self.time_window[0] * 8.0))]
-                    - new_eda_max_peaks_value[i],
+                    self.eda_window[int(indice_max_peak + self.fs / 2)] - new_eda_max_peaks_value[i],
                     3,
                 )
             )
 
-            # Interpolate polynomial of order 3 for this segment
             coefficientCubic = self._interpolate_polynomial3(
-                round(new_eda_min_peaks_idx[i] - self.time_window[0], 3),
-                round(self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3),  # x1, y1
-                round(new_eda_min_peaks_idx[i] + (1 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
+                round(new_eda_min_peaks_idx[i] - self.time_window[0], 3),  # x1
+                round(self.eda_window[int(indice_min_peak)], 3),  # y1
+                round(new_eda_min_peaks_idx[i] + (1 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # x1a
                 round(
-                    self.eda_window[
-                        int(round(new_eda_min_peaks_idx[i] + (1 / 4) * dt / 5 - self.time_window[0], 3) * 8)
-                    ],
+                    self.eda_window[int(indice_min_peak + int((1 / 4) * dt / 5 * self.fs))],
                     3,
                 )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # x1a, y1a
-                round(new_eda_min_peaks_idx[i] + (2 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
+                - round(self.eda_window[int(indice_min_peak)], 3),  # y1a
+                round(new_eda_min_peaks_idx[i] + (2 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # x1b
                 round(
-                    self.eda_window[
-                        int(round(new_eda_min_peaks_idx[i] + (2 / 4) * dt / 5 - self.time_window[0], 3) * 8)
-                    ],
+                    self.eda_window[int(indice_min_peak + int((2 / 4) * dt / 5 * self.fs))],
                     3,
                 )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # x1b, y1b
-                round(new_eda_min_peaks_idx[i] + (3 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
+                - round(self.eda_window[int(indice_min_peak)], 3),  # y1b
+                round(new_eda_min_peaks_idx[i] + (3 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # x1c
                 round(
-                    self.eda_window[
-                        int(round(new_eda_min_peaks_idx[i] + (3 / 4) * dt / 5 - self.time_window[0], 3) * 8)
-                    ],
+                    self.eda_window[int(indice_min_peak + int((3 / 4) * dt / 5 * self.fs))],
                     3,
                 )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # x1c, y1c
-                round(new_eda_max_peaks_idx[i], 3) - round(new_eda_min_peaks_idx[i], 3),
-                round(self.eda_window[int(round(new_eda_max_peaks_idx[i] - self.time_window[0], 3) * 8)], 3)
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # x2, y2
-                round(new_eda_max_peaks_idx[i] - (1 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
+                - round(self.eda_window[int(indice_min_peak)], 3),  # y1c
+                round(new_eda_max_peaks_idx[i], 3) - round(new_eda_min_peaks_idx[i], 3),  # x2
+                round(self.eda_window[int(indice_max_peak)], 3)
+                - round(self.eda_window[int(indice_min_peak)], 3),  # y2
+                round(new_eda_max_peaks_idx[i] - (1 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # x2a
                 round(
-                    self.eda_window[
-                        int(round(new_eda_max_peaks_idx[i] - (1 / 4) * dt / 5 - self.time_window[0], 3) * 8)
-                    ],
+                    self.eda_window[int(indice_max_peak - int((1 / 4) * dt / 5 * self.fs))],
                     3,
                 )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # x2a, y2a
-                round(new_eda_max_peaks_idx[i] - (2 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
+                - round(self.eda_window[int(indice_min_peak)], 3),  # y2a
+                round(new_eda_max_peaks_idx[i] - (2 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # x2b
                 round(
-                    self.eda_window[
-                        int(round(new_eda_max_peaks_idx[i] - (2 / 4) * dt / 5 - self.time_window[0], 3) * 8)
-                    ],
+                    self.eda_window[int(indice_max_peak - int((2 / 4) * dt / 5 * self.fs))],
                     3,
                 )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # x2b, y2b
-                round(new_eda_max_peaks_idx[i] - (3 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
+                - round(self.eda_window[int(indice_min_peak)], 3),  # y2b
+                round(new_eda_max_peaks_idx[i] - (3 / 4) * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # x2c
                 round(
-                    self.eda_window[
-                        int(round(new_eda_max_peaks_idx[i] - (3 / 4) * dt / 5 - self.time_window[0], 3) * 8)
-                    ],
+                    self.eda_window[int(indice_max_peak - int((3 / 4) * dt / 5 * self.fs))],
                     3,
                 )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # x2c, y2c
-                round(new_eda_min_peaks_idx[i] + 1 * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
-                round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] + 1 * dt / 5 - self.time_window[0], 3) * 8)], 3
-                )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # xa, ya
-                round(new_eda_min_peaks_idx[i] + 2 * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
-                round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] + 2 * dt / 5 - self.time_window[0], 3) * 8)], 3
-                )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # xb, yb
-                round(new_eda_min_peaks_idx[i] + 3 * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
-                round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] + 3 * dt / 5 - self.time_window[0], 3) * 8)], 3
-                )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # xc, yc
-                round(new_eda_min_peaks_idx[i] + 4 * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),
-                round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] + 4 * dt / 5 - self.time_window[0], 3) * 8)], 3
-                )
-                - round(
-                    self.eda_window[int(round(new_eda_min_peaks_idx[i] - self.time_window[0], 3) * 8)], 3
-                ),  # xd, yd
+                - round(self.eda_window[int(indice_min_peak)], 3),  # y2c
+                round(new_eda_min_peaks_idx[i] + 1 * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # xa
+                round(self.eda_window[int(indice_min_peak + int(1 * dt / 5 * self.fs))], 3)
+                - round(self.eda_window[int(indice_min_peak)], 3),  # ya
+                round(new_eda_min_peaks_idx[i] + 2 * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # xb
+                round(self.eda_window[int(indice_min_peak + int(2 * dt / 5 * self.fs))], 3)
+                - round(self.eda_window[int(indice_min_peak)], 3),  # yb
+                round(new_eda_min_peaks_idx[i] + 3 * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # xc
+                round(self.eda_window[int(indice_min_peak + int(3 * dt / 5 * self.fs))], 3)
+                - round(self.eda_window[int(indice_min_peak)], 3),  # yc
+                round(new_eda_min_peaks_idx[i] + 4 * dt / 5, 3) - round(new_eda_min_peaks_idx[i], 3),  # xd
+                round(self.eda_window[int(indice_min_peak + int(4 * dt / 5 * self.fs))], 3)
+                - round(self.eda_window[int(indice_min_peak)], 3),  # yd
             )
 
             # Store coefficientCubics for plotting and debugging
@@ -914,16 +848,6 @@ class EDAAnalyzer:
         eda_peaks_min_idx, eda_peaks_max_idx = self._filter_indices(
             self.eda_window, eda_peaks_min_idx, eda_peaks_max_idx, 0.01, 0.5, 0
         )
-        eda_peaks_min_idx, eda_peaks_max_idx = self._edge_removal(eda_peaks_min_idx, eda_peaks_max_idx, 1)
-
-        # # EDA-peak detection using NeuroKit2
-        # signals, info = nk.eda_process(smooth_eda, sampling_rate=8,method="neuroKit")
-        # features = [info["SCR_Onsets"], info["SCR_Peaks"]]
-        # idx_SCR_Onset = np.array(features[0])
-        # idx_SCR_Peaks = np.array(features[1])
-        # idx_SCR_Onset, idx_SCR_Peaks = self._edge_removal(idx_SCR_Onset, idx_SCR_Peaks, 1)
-        # eda_peaks_min_idx,eda_peaks_max_idx,idx_SCR_Onset,idx_SCR_Peaks = self._intersection(eda_peaks_min_idx,
-        # eda_peaks_max_idx,idx_SCR_Onset,idx_SCR_Peaks)
 
         # Get the values of the detected peaks from the EDA signal
         eda_peaks_min_val, eda_peaks_max_val = self._get_eda_values(eda_peaks_min_idx, eda_peaks_max_idx, smooth_eda)
