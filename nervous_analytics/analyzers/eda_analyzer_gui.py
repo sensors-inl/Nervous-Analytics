@@ -292,7 +292,7 @@ class EDAAnalysisApp:
                 # Process this batch of data
                 batch_eda = eda_data[start_idx:end_idx]
                 batch_time = time_data[start_idx:end_idx]
-                
+
                 # Check if electrodes are connected
                 min_value = min(batch_eda)
                 if min_value < 0.2:

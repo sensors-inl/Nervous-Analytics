@@ -107,7 +107,9 @@ class EDAAnalyzer:
         self.history_eda_min_peak_value = np.array([], dtype=float)
         self.eda_window = np.zeros(self.window_duration * self.fs, dtype=np.float32)
         self.time_window = np.linspace(
-            new_time_start - (self.window_duration * self.fs - 1) / self.fs, new_time_start, self.window_duration * self.fs
+            new_time_start - (self.window_duration * self.fs - 1) / self.fs,
+            new_time_start,
+            self.window_duration * self.fs,
         )
 
     def _butter_filter(self, cutoff, filter_type="low", order=4):
@@ -356,7 +358,7 @@ class EDAAnalyzer:
         """
 
         # Minimum peak distance constraint
-        min_distance = 1/self.fs
+        min_distance = 1 / self.fs
 
         # Filter out duplicate peaks
         unique_min_mask = np.all(
@@ -629,17 +631,17 @@ class EDAAnalyzer:
             new_eda_min_peaks_value = self.history_eda_min_peak_value[
                 self.history_eda_min_peak_idx > self.previous_history_eda_min_peak_idx[-1]
             ]
-            
+
         else:
             new_eda_max_peaks_idx = self.history_eda_max_peak_idx
             new_eda_min_peaks_idx = self.history_eda_min_peak_idx
             new_eda_max_peaks_value = self.history_eda_max_peak_value
-            new_eda_min_peaks_value = self.history_eda_min_peak_value        
+            new_eda_min_peaks_value = self.history_eda_min_peak_value
 
         if len(new_eda_max_peaks_idx) == 0:
             self.previous_history_eda_max_peak_idx = self.history_eda_max_peak_idx.copy()
             self.previous_history_eda_min_peak_idx = self.history_eda_min_peak_idx.copy()
-            
+
             return empty_array, empty_array, empty_array, empty_array, empty_array, empty_array, empty_array
 
         # Initialize lists for response parameters
@@ -655,7 +657,6 @@ class EDAAnalyzer:
 
         # Process each new peak
         for i in range(len(new_eda_max_peaks_idx)):
-
             value = round((new_eda_max_peaks_value[i] - new_eda_min_peaks_value[i]), 3)
             dt = round((new_eda_max_peaks_idx[i] - new_eda_min_peaks_idx[i]), 3)
 
