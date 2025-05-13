@@ -474,7 +474,7 @@ class ECGAnalyzer:
 
         # Detect discontinuity
         if abs(time_data[0] - self.time_window[-1]) > TIME_GAP_THRESHOLD:
-            logger.info(f"Measurement discontinuity detected: {time_data[0]} vs {self.time_window[-1]}")
+            logger.info(f"ECG Measurement discontinuity detected at {time_data[0]} vs {self.time_window[-1]}")
             self._reinit_history()
 
         # Update sliding windows
