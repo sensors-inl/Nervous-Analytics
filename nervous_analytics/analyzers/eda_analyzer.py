@@ -88,13 +88,16 @@ class EDAAnalyzer:
         self.highpass_coeffs = self._butter_filter(0.1, "high")
         self.savitzky_golay_coeffs = np.array(savgol_coeffs(8, 3)), np.array([1])
 
-    def _reinit_history(self):
+    def _reinit_history(self, new_time_start):
         """
         Reinitialize history arrays and windows when a discontinuity is detected
 
         This method resets all the history arrays and windows to their initial state,
         effectively forgetting all previous peaks and signal data. It's called when
         a significant time gap is detected in the incoming data.
+
+        Parameters:
+            new_time_start (float): New start for time_window initialisation
         """
         self.history_eda_max_peak_idx = np.array([], dtype=float)
         self.history_eda_min_peak_idx = np.array([], dtype=float)
@@ -104,7 +107,7 @@ class EDAAnalyzer:
         self.history_eda_min_peak_value = np.array([], dtype=float)
         self.eda_window = np.zeros(self.window_duration * self.fs, dtype=np.float32)
         self.time_window = np.linspace(
-            -(self.window_duration * self.fs - 1) / self.fs, 0, self.window_duration * self.fs
+            new_time_start - (self.window_duration * self.fs - 1) / self.fs, new_time_start, self.window_duration * self.fs
         )
 
     def _butter_filter(self, cutoff, filter_type="low", order=4):
@@ -353,12 +356,13 @@ class EDAAnalyzer:
         """
 
         # Minimum peak distance constraint
-        min_distance = 0.3
+        min_distance = 1/self.fs
 
         # Filter out duplicate peaks
         unique_min_mask = np.all(
             np.abs(new_min_peaks[:, np.newaxis] - self.history_eda_min_peak_idx) >= min_distance, axis=1
         )
+
         unique_max_mask = np.all(
             np.abs(new_max_peaks[:, np.newaxis] - self.history_eda_max_peak_idx) >= min_distance, axis=1
         )
@@ -625,15 +629,17 @@ class EDAAnalyzer:
             new_eda_min_peaks_value = self.history_eda_min_peak_value[
                 self.history_eda_min_peak_idx > self.previous_history_eda_min_peak_idx[-1]
             ]
+            
         else:
             new_eda_max_peaks_idx = self.history_eda_max_peak_idx
             new_eda_min_peaks_idx = self.history_eda_min_peak_idx
             new_eda_max_peaks_value = self.history_eda_max_peak_value
-            new_eda_min_peaks_value = self.history_eda_min_peak_value
+            new_eda_min_peaks_value = self.history_eda_min_peak_value        
 
         if len(new_eda_max_peaks_idx) == 0:
             self.previous_history_eda_max_peak_idx = self.history_eda_max_peak_idx.copy()
             self.previous_history_eda_min_peak_idx = self.history_eda_min_peak_idx.copy()
+            
             return empty_array, empty_array, empty_array, empty_array, empty_array, empty_array, empty_array
 
         # Initialize lists for response parameters
@@ -649,6 +655,7 @@ class EDAAnalyzer:
 
         # Process each new peak
         for i in range(len(new_eda_max_peaks_idx)):
+
             value = round((new_eda_max_peaks_value[i] - new_eda_min_peaks_value[i]), 3)
             dt = round((new_eda_max_peaks_idx[i] - new_eda_min_peaks_idx[i]), 3)
 
@@ -816,8 +823,8 @@ class EDAAnalyzer:
 
         # Check for measurement discontinuity
         if abs(time_data[0] - self.time_window[-1]) > TIME_GAP_THRESHOLD:
-            logger.info("Measurement discontinuity detected!")
-            self._reinit_history()
+            logger.info(f"EDA Measurement discontinuity detected at {time_data[0]} vs {self.time_window[-1]}")
+            self._reinit_history(time_data[0])
 
         # Update sliding windows with new data
         self.eda_window = np.roll(self.eda_window, -len(eda_data))
