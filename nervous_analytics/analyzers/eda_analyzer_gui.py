@@ -292,6 +292,11 @@ class EDAAnalysisApp:
                 # Process this batch of data
                 batch_eda = eda_data[start_idx:end_idx]
                 batch_time = time_data[start_idx:end_idx]
+                
+                # Check if electrodes are connected
+                min_value = min(batch_eda)
+                if min_value < 0.2:
+                    continue
 
                 # Analyze this batch
                 amplitude, duration, level_scr, timestamp = self.analyzer.update_eda_peak(batch_eda, batch_time)
