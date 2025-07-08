@@ -125,7 +125,7 @@ class ECGAnalyzerGUI:
             self.status_text.set("Loading ECG data...")
             self.root.update()
 
-            df = pd.read_csv(self.input_file.get())
+            df = pd.read_csv(self.input_file.get(), delimiter=";")
 
             # Find ECG and Time columns
             ecg_col = self.find_column_name(df, "ECG")
